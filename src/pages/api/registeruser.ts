@@ -1,6 +1,9 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import initAuth from "../../utils/initAuth";
 initAuth();
 
@@ -16,9 +19,13 @@ export default async function handler(
 
   try {
     const auth = getAuth();
-    const { user } = await signInWithEmailAndPassword(auth, email, password);
-    const token = await user.getIdToken();
-    return res.status(200).json({ token });
+    const { user } = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    console.log(user);
+    return res.status(200).send("Usuário cadastrado com sucesso");
   } catch (error) {
     return res.status(400).json({ message: "Invalid credentials" });
   }
