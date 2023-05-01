@@ -1,6 +1,7 @@
 //import 'firebase/database'
-import { initializeApp } from "firebase/app";
+import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
 import admin from "../../firebase-admin-config";
 import { init } from "next-firebase-auth";
 
@@ -15,6 +16,12 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIRABASE_DATABASEURL,
 };
 
+if (!getApps.length) {
+  initializeApp(firebaseConfig);
+} else {
+  getApp();
+}
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-export { app, auth };
+const database = getDatabase();
+export { app, auth, database };
