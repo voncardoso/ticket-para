@@ -1,29 +1,32 @@
 import Image from "next/image";
-import background from "../assets/backgroundLogin.jpg";
-import logo from "../assets/logo.png";
 import Link from "next/link";
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 import { api } from "@/lib/api";
 import { useState } from "react";
+import backgroundLogin from "../assets/backgroundLogin.jpg";
+import logo from "../assets/logo.png";
 
 type Inputs = {
   email: string;
   password: string;
 };
 
-export default function Home() {
+export default function Register() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm();
+
   const [loadin, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
   const onSubmit: SubmitHandler<FieldValues> = async (data: FieldValues) => {
     const { email, password } = data as Inputs;
     setLoading(true);
     try {
-      const response = await api.post("api/auth", {
+      const response = await api.post("api/registeruser", {
         email: email,
         password: password,
       });
@@ -34,11 +37,11 @@ export default function Home() {
         );
         setLoading(false);
         setError(false);
-        console.log(response);
+        window.alert("Usuário cdastrado com sucesso!!");
       }
     } catch (error) {
-      setLoading(false);
       setError(true);
+      setLoading(false);
     }
   };
   return (
@@ -54,14 +57,16 @@ export default function Home() {
             src={logo}
             alt="logo do site"
           />
-          <h1 className="text-white text-3xl mb-8">Login</h1>
+          <h1 className="text-white text-3xl mb-8">Cadastre-se</h1>
+
           {error ? (
             <div className="border-2 p-2 text-center mb-4 rounded-md border-red-600 text-red-600 ">
-              <p>E-mail ou senha invalido!</p>
+              <p>E-mail invalido</p>
             </div>
           ) : (
             ""
           )}
+
           <label className="text-white text-lg" htmlFor="">
             E-mail
           </label>
@@ -82,28 +87,27 @@ export default function Home() {
 
           {loadin ? (
             <button className="text-white text-xl mt-8 bg-green-300 p-3 rounded-md cursor-pointer hover:bg-green-100 transition duration-500">
-              Entrando...
+              Cadastrando...
             </button>
           ) : (
             <button className="text-white text-xl mt-8 bg-green-300 p-3 rounded-md cursor-pointer hover:bg-green-100 transition duration-500">
-              Entrar
+              Cadastrar
             </button>
           )}
         </form>
 
         <Link
           className="texte-center text-white flex justify-center  pb-6 "
-          href="/register"
+          href="/"
         >
-          Não tem cadastro?
-          <p className="ml-1 text-green-300 hover:underline">Cadastre-se</p>
+          Volta para o
+          <p className="ml-1 text-green-300 hover:underline">Login</p>
         </Link>
       </div>
-
       <div className="max-md:hidden ">
         <Image
           className=" w-full h-screen "
-          src={background}
+          src={backgroundLogin}
           alt="logo do site"
         />
       </div>
