@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 import { api } from "@/lib/api";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 type Inputs = {
   email: string;
@@ -17,6 +18,7 @@ export default function Home() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const router = useRouter();
   const [loadin, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const onSubmit: SubmitHandler<FieldValues> = async (data: FieldValues) => {
@@ -34,7 +36,7 @@ export default function Home() {
         );
         setLoading(false);
         setError(false);
-        console.log(response);
+        router.push("/dashboard");
       }
     } catch (error) {
       setLoading(false);

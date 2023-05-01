@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 import { api } from "@/lib/api";
 import { useState } from "react";
@@ -18,7 +19,7 @@ export default function Register() {
     reset,
     formState: { errors },
   } = useForm();
-
+  const router = useRouter();
   const [loadin, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -38,6 +39,7 @@ export default function Register() {
         setLoading(false);
         setError(false);
         window.alert("Usuário cdastrado com sucesso!!");
+        router.push("/dashboard");
       }
     } catch (error) {
       setError(true);
