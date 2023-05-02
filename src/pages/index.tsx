@@ -29,6 +29,7 @@ export default function Home() {
         email: email,
         password: password,
       });
+      console.log(response);
       if (response.status === 200) {
         window.localStorage.setItem(
           "tokenIngressoPara-v1",
