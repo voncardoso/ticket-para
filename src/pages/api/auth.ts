@@ -9,12 +9,13 @@ export default async function handler(
   res: NextApiResponse
 ) {
   res.setHeader("Access-Control-Allow-Origin", "*");
+  console.log(req.method);
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
   const { email, password } = req.body;
-
+  console.log(email, password);
   try {
     const auth = getAuth();
     const { user } = await signInWithEmailAndPassword(auth, email, password);
