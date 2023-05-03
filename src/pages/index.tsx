@@ -24,6 +24,7 @@ export default function Home() {
   const onSubmit: SubmitHandler<FieldValues> = async (data: FieldValues) => {
     const { email, password } = data as Inputs;
     setLoading(true);
+    console.log("teste");
     try {
       const response = await api.post("api/auth", {
         email: email,
