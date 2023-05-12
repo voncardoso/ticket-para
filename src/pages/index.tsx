@@ -38,13 +38,15 @@ export default function Home() {
       })
      .then(response => response.json())
       .then(data => {
-        window.localStorage.setItem(
-          "tokenIngressoPara-v1",
-          data.token
-        );
-        setLoading(false);
-        setError(false);
-        router.push("/dashboard");
+        if(data.token){
+          window.localStorage.setItem(
+            "tokenIngressoPara-v1",
+            data.token
+          );
+          setLoading(false);
+          setError(false);
+          router.push("/dashboard");
+        }
       })
       .catch(error => console.error(error));
        
