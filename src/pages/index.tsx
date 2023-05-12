@@ -38,6 +38,7 @@ export default function Home() {
       })
      .then(response => response.json())
       .then(data => {
+        console.log(data)
         if(data.token){
           window.localStorage.setItem(
             "tokenIngressoPara-v1",
@@ -48,7 +49,10 @@ export default function Home() {
           router.push("/dashboard");
         }
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+        setLoading(false);
+        console.error(error)
+      });
        
     } catch (error) {
       setLoading(false);
