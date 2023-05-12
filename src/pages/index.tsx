@@ -24,22 +24,30 @@ export default function Home() {
   const onSubmit: SubmitHandler<FieldValues> = async (data: FieldValues) => {
     const { email, password } = data as Inputs;
     setLoading(true);
-    console.log("teste");
+
     try {
-      const response = await api.post("api/auth", {
-        email: email,
-        password: password,
-      });
-      console.log(response);
-      if (response.status === 200) {
+      fetch('./api/auth',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        })
+      })
+     .then(response => response.json())
+      .then(data => {
         window.localStorage.setItem(
           "tokenIngressoPara-v1",
-          response.data.token
+          data.token
         );
         setLoading(false);
         setError(false);
         router.push("/dashboard");
-      }
+      })
+      .catch(error => console.error(error));
+       
     } catch (error) {
       setLoading(false);
       setError(true);
