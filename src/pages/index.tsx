@@ -2,8 +2,9 @@ import Image from "next/image";
 import background from "../assets/backgroundLogin.jpg";
 import logo from "../assets/logo.png";
 import Link from "next/link";
+
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
-import { api } from "@/lib/api";
+import { getAuth,  signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useRouter } from "next/router";
 
@@ -24,35 +25,16 @@ export default function Home() {
   const onSubmit: SubmitHandler<FieldValues> = async (data: FieldValues) => {
     const { email, password } = data as Inputs;
     setLoading(true);
-
+    const auth = getAuth();
     try {
-      fetch('./api/auth',{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password
-        })
-      })
-     .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        if(data.token){
-          window.localStorage.setItem(
-            "tokenIngressoPara-v1",
-            data.token
-          );
-          setLoading(false);
-          setError(false);
-          router.push("/dashboard");
-        }
-      })
-      .catch(error => {
-        setLoading(false);
-        console.error(error)
-      });
+      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      const token = await user.getIdToken();
+      
+      if(token){
+        window.localStorage.setItem("tokenIngressoPara-v1", token)
+        setLoading(false)
+        router.push('/dashboard');
+      }
        
     } catch (error) {
       setLoading(false);
