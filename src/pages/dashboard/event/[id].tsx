@@ -10,13 +10,26 @@ export default function Event() {
           <header>
             <button>Cadastrar ingresso</button>
           </header>
-          <ul>
-            <li>1</li>
-            <li>2</li>
-            <li>3</li>
-            <li>4</li>
-            <li>5</li>
-          </ul>
+          <table>
+            <thead>
+              <tr>
+                <th>Nº</th>
+                <th>Evento</th>
+                <th>Ingresso</th>
+                <th>Valor</th>
+                <th>tipo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
