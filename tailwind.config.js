@@ -11,6 +11,7 @@ module.exports = {
         background: "#16181E",
         "gray-100": "#9BA2AD",
         "gray-400": "#21242D",
+        "green-50": "#D7FAF8",
         "green-100": "#00CCC0",
         "green-300": "#00B9AE",
       },

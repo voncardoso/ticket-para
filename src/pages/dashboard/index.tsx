@@ -3,6 +3,8 @@ import { PlusCircle, MagnifyingGlass } from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";
 import ImgEvent from "../../assets/img-show.jpg";
+import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
+import { CreateEvent } from "./CreateEvent";
 
 export default function Dashboard() {
   return (
@@ -20,15 +22,15 @@ export default function Dashboard() {
           </label>
         </header>
         <div className="w-full flex gap-5 flex-wrap">
-          <Link
-            className="text-gray-100 flex justify-center items-center w-56 h-56 border-2 border-gray-100 rounded-md border-dashed"
-            href=" "
-          >
-            <div>
-              <PlusCircle size={80} />
-              <strong className="mt-2">Criar Evento</strong>
-            </div>
-          </Link>
+          <Dialog>
+            <DialogTrigger className="text-gray-100 flex justify-center items-center w-56 h-56 border-2 border-gray-100 rounded-md border-dashed">
+              <div>
+                <PlusCircle size={80} />
+                <strong className="mt-2">Criar Evento</strong>
+              </div>
+            </DialogTrigger>
+            <CreateEvent />
+          </Dialog>
           <Link
             className=" text-gray-100 flex justify-center items-center w-56 h-56 rounded-md"
             href=""
