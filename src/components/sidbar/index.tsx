@@ -2,6 +2,8 @@ import { CalendarBlank, SignOut } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import logomarca from "../../assets/logomarca.png";
+import Image from "next/image";
 
 export default function Sidbar() {
   const router = useRouter();
@@ -19,7 +21,11 @@ export default function Sidbar() {
         <Link href="" className="">
           {" "}
           <h1 className="text-2xl font-semibold text-white max-md:hidden">
-            Ingressos Pará
+            <Image
+              className="mx-auto w-12 relative bottom-15"
+              src={logomarca}
+              alt="logo do site"
+            />
           </h1>
           <h1 className="md:hidden  text-lg font-semibold text-white max-md:block max-">
             Ing. Pará
