@@ -10,7 +10,7 @@ import { FieldValues, useForm } from "react-hook-form";
 import { getDatabase, push, ref, set } from "firebase/database";
 import { database } from "../../../services/firebase";
 
-export function CreateEvent() {
+export default function CreateEvent() {
   const {
     register,
     handleSubmit,
