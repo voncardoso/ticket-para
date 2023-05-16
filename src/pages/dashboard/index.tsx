@@ -4,10 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import ImgEvent from "../../assets/img-show.jpg";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
-import { CreateEvent } from "./CreateEvent";
+
 import { GetStaticProps } from "next";
 import { getDatabase, ref, get } from "firebase/database";
 import { database } from "@/services/firebase";
+import CreateEvent from "./CreateEvent";
 
 interface EventsProps {
   events: {
