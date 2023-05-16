@@ -49,10 +49,11 @@ export default function Dashboard({ events }: EventsProps) {
           </Dialog>
 
           {data.map(({ id, name, date }: any) => {
+            console.log(id);
             return (
               <Link
                 className="shadow-xl shadow-green-800 text-gray-100 flex justify-center items-center w-56 h-56 rounded-md"
-                href=""
+                href={`/dashboard/event/${id}`}
                 key={id}
               >
                 <div className="h-full w-full">
