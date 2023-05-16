@@ -5,8 +5,24 @@ import Link from "next/link";
 import ImgEvent from "../../assets/img-show.jpg";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import { CreateEvent } from "./CreateEvent";
+import { GetStaticProps } from "next";
+import { getDatabase, ref, get } from "firebase/database";
+import { database } from "@/services/firebase";
 
-export default function Dashboard() {
+interface EventsProps {
+  events: {
+    id: string;
+    name: string;
+    date: string;
+    hours: string;
+    created_at: string;
+    description: string;
+  };
+}
+
+export default function Dashboard({ events }: EventsProps) {
+  const data: EventsProps[] = events as any;
+
   return (
     <section className="flex bg-background h-screen gap-5">
       <Sidbar />
@@ -31,25 +47,53 @@ export default function Dashboard() {
             </DialogTrigger>
             <CreateEvent />
           </Dialog>
-          <Link
-            className=" text-gray-100 flex justify-center items-center w-56 h-56 rounded-md"
-            href=""
-          >
-            <div className="h-full w-full">
-              <Image
-                className="h-full w-full rounded-md transition duration-500 opacity-50 hover:opacity-25"
-                src={ImgEvent}
-                quality={100}
-                alt=""
-              />
-              <div className="mx-auto rounded-md w-11/12 relative bottom-14 text-center text-white bg-white bg-opacity-50 text-white">
-                <p>festa de formatura</p>
-                <p>12/12/2032</p>
-              </div>
-            </div>
-          </Link>
+
+          {data.map(({ id, name, date }: any) => {
+            return (
+              <Link
+                className="shadow-xl shadow-green-800 text-gray-100 flex justify-center items-center w-56 h-56 rounded-md"
+                href=""
+                key={id}
+              >
+                <div className="h-full w-full">
+                  <Image
+                    className="h-full w-full rounded-md transition duration-200 opacity-50 hover:opacity-25"
+                    src={ImgEvent}
+                    quality={100}
+                    alt=""
+                  />
+                  <div className="mx-auto rounded-md w-11/12 relative bottom-14 text-center text-white bg-green-400  text-white">
+                    <p>{name}</p>
+                    <p>{date}</p>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
+
+export const getStaticProps: GetStaticProps = async () => {
+  const response = ref(database, "event");
+  let events = [] as any;
+  try {
+    const snapshot = await get(response);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      console.log("foi", data);
+      events = Object.keys(data).map((id) => ({ id, ...data[id] }));
+      // Faça o que for necessário com os dados lidos, como exibir em uma lista
+    } else {
+      console.log("Nenhum dado encontrado");
+    }
+  } catch (error) {}
+
+  return {
+    props: {
+      events,
+    },
+  };
+};
