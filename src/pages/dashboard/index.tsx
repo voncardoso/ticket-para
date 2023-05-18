@@ -56,7 +56,7 @@ export default function Dashboard( {data} : EventsProps) {
   } = useForm();
 
   async function handleCreateEvent(data: FieldValues) {
-    const date = new Date();
+    const date = new Date().toISOString();
     const response = await addDoc(collection(database, "event"), {
       name: data.name,
       date: data.date,
