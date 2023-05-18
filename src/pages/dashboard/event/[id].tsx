@@ -1,6 +1,7 @@
 import Sidbar from "@/components/sidbar";
 import { Dialog, DialogPortal, DialogTrigger } from "@radix-ui/react-dialog";
 import { motion } from "framer-motion";
+import {UserStorageLogin} from "../../../Context/useContextLogin"
 export default function Event() {
   return (
     <section className="flex bg-background h-screen gap-5">
