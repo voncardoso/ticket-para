@@ -4,7 +4,7 @@ import logo from "../assets/logo.png";
 import Link from "next/link";
 
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
-import { getAuth,  signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useRouter } from "next/router";
 
@@ -29,13 +29,11 @@ export default function Home() {
     try {
       const { user } = await signInWithEmailAndPassword(auth, email, password);
       const token = await user.getIdToken();
-      
-      if(token){
-        window.localStorage.setItem("tokenIngressoPara-v1", token)
-        setLoading(false)
-        router.push('/dashboard');
+      console.log(user);
+      if (token) {
+        window.localStorage.setItem("tokenIngressoPara-v1", token);
+        router.push("/dashboard");
       }
-       
     } catch (error) {
       setLoading(false);
       setError(true);
