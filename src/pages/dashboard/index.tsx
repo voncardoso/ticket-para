@@ -181,12 +181,10 @@ export default function Dashboard({ events }: EventsProps) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const collectionRef = collection(database, "event");
-  const querySnapshot = await getDocs(collectionRef);
-  const events = querySnapshot.docs.map((doc) => ({
-    ...doc.data(),
-    id: doc.id,
-  }));
+  const response = await fetch("https://ticket-para.vercel.app/api/getevents",  {
+    method: 'GET',
+  })
+  const events = await response.json()
 
   return {
     props: {

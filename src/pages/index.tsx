@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router';
 
 type Inputs = {
   email: string;
@@ -14,14 +14,18 @@ type Inputs = {
 };
 
 export default function Home() {
+  const router = useRouter();
+  const [loadin, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const router = useRouter();
-  const [loadin, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  
+
   const onSubmit: SubmitHandler<FieldValues> = async (data: FieldValues) => {
     const { email, password } = data as Inputs;
     setLoading(true);
@@ -31,8 +35,9 @@ export default function Home() {
       const token = await user.getIdToken();
       console.log(user);
       if (token) {
+        console.log("foi")
         window.localStorage.setItem("tokenIngressoPara-v1", token);
-        router.push("/dashboard");
+        router.push('/dashboard');
       }
     } catch (error) {
       setLoading(false);
