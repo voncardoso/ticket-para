@@ -69,7 +69,10 @@ export default function Event({data} : EventsProps) {
   return (
     <section className="flex bg-background h-screen gap-5">
       <Sidbar />
-      <div className="w-full">
+      <div className="w-full h-screen overflow-y-auto">
+        <header>
+          <h1 className="p-2 text-2xl text-white">Nome do Evento | Data do evento</h1>
+        </header>
         <div className="p-4 text-center text-white">Grafico de ingressos</div>
         <header className="p-4 flex justify-end">
           <Dialog>

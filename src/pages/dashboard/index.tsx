@@ -75,7 +75,7 @@ export default function Dashboard( {data} : EventsProps) {
   return (
     <section className="flex bg-background h-screen gap-5">
       <Sidbar />
-      <div className="w-full">
+      <div className="w-full h-screen overflow-y-auto">
         <header className="flex justify-end p-4 ">
           <label className="flex gap-2 bg-gray-400 p-2 rounded-md" htmlFor="">
             <MagnifyingGlass className="text-gray-100" size={24} />
