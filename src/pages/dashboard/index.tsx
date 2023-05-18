@@ -22,6 +22,7 @@ import {
   doc,
   getDocs,
 } from "firebase/firestore";
+import { api } from "../../lib/api";
 
 interface EventsProps {
   events: {
@@ -33,6 +34,10 @@ interface EventsProps {
     description: string;
   };
 }
+
+type DashboardProps = {
+  events: any; // Defina o tipo de dados esperado para a resposta
+};
 
 export default function Dashboard({ events }: EventsProps) {
   const data: EventsProps[] = events as any;
@@ -180,12 +185,10 @@ export default function Dashboard({ events }: EventsProps) {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps<DashboardProps> = async () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
-  const response = await fetch(`${apiUrl}/api/getevents`,  {
-    method: 'GET',
-  })
-  const events = await response.json()
+  const response = await api.get("api/getevents")
+  const events = await response.data
   console.log("events")
   return {
     props: {
