@@ -25,7 +25,7 @@ import {
 import { api } from "../../lib/api";
 
 interface EventsProps {
-  events: {
+  data: {
     id: string;
     name: string;
     date: string;
@@ -36,11 +36,11 @@ interface EventsProps {
 }
 
 type DashboardProps = {
-  events: any; // Defina o tipo de dados esperado para a resposta
+  data: any; // Defina o tipo de dados esperado para a resposta
 };
 
-export default function Dashboard({ events }: EventsProps) {
-  const data: EventsProps[] = events as any;
+export default function Dashboard({ data }: EventsProps) {
+  const events: EventsProps[] = data as any;
   const {
     register,
     handleSubmit,
@@ -157,7 +157,7 @@ export default function Dashboard({ events }: EventsProps) {
             </DialogPortal>
           </Dialog>
 
-          {data?.map(({ id, name, date }: any) => {
+          {events?.map(({ id, name, date }: any) => {
             return (
               <Link
                 className="shadow-xl shadow-green-800 text-gray-100 flex justify-center items-center w-56 h-56 rounded-md"
@@ -186,25 +186,21 @@ export default function Dashboard({ events }: EventsProps) {
 }
 
 export const getStaticProps: GetStaticProps<DashboardProps> = async () => {
-
-  if(process.env.NODE_ENV !== 'development'){
+  console.log("teste", process.env.NODE_ENV)
+  if(process.env.NODE_ENV === 'development'){
      // Retorna os dados estáticos diretamente no ambiente de desenvolvimento
      return {
       props: {
-        events: []
+        data: [],
       }
     };
-  }else{
+  }
     const response = await api.get("api/getevents")
-    const events = await response.data
-    console.log("events")
+    const data = await response.data
+
     return {
       props: {
-        events,
+        data,
       },
     };
-  }
-    
-  
-
 };
