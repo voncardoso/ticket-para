@@ -186,17 +186,13 @@ export default function Dashboard({ data }: EventsProps) {
 }
 
 export const getStaticProps: GetStaticProps<DashboardProps> = async () => {
-  console.log("teste", process.env.NODE_ENV)
-  if(process.env.NODE_ENV === 'development'){
-     // Retorna os dados estáticos diretamente no ambiente de desenvolvimento
-     return {
-      props: {
-        data: [],
-      }
-    };
-  }
-    const response = await api.get("api/getevents")
-    const data = await response.data
+
+  const collectionRef = collection(database, "event");
+  const querySnapshot = await getDocs(collectionRef);
+  const data = querySnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  }));
 
     return {
       props: {
