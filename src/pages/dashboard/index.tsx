@@ -22,25 +22,32 @@ import {
   doc,
   getDocs,
 } from "firebase/firestore";
-import { api } from "../../lib/api";
+import { useContext } from "react";
+import { UserContextLogin } from "@/Context/useContextLogin";
 
 interface EventsProps {
-  data: {
+  data: []
+}
+
+interface Treste  {
     id: string;
     name: string;
     date: string;
     hours: string;
     created_at: string;
     description: string;
-  };
+    uid: string
 }
 
 type DashboardProps = {
   data: any; // Defina o tipo de dados esperado para a resposta
 };
 
-export default function Dashboard({ data }: EventsProps) {
-  const events: EventsProps[] = data as any;
+export default function Dashboard( {data} : EventsProps) {
+  const {dataUser} = useContext(UserContextLogin)
+  console.log(data)
+  const events = data.filter((item: any) => item.uid === dataUser)
+
   const {
     register,
     handleSubmit,
@@ -49,13 +56,14 @@ export default function Dashboard({ data }: EventsProps) {
   } = useForm();
 
   async function handleCreateEvent(data: FieldValues) {
-    const teste = new Date();
+    const date = new Date().toISOString();
     const response = await addDoc(collection(database, "event"), {
       name: data.name,
       date: data.date,
       hours: data.hours,
-      created_at: String(teste),
+      created_at: String(date),
       description: data.description,
+      uid: dataUser,
     });
 
     if (response) {
@@ -186,14 +194,13 @@ export default function Dashboard({ data }: EventsProps) {
 }
 
 export const getStaticProps: GetStaticProps<DashboardProps> = async () => {
-
+  
   const collectionRef = collection(database, "event");
   const querySnapshot = await getDocs(collectionRef);
   const data = querySnapshot.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
   }));
-
     return {
       props: {
         data,

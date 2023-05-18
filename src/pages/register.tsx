@@ -6,6 +6,8 @@ import { useState } from "react";
 import backgroundLogin from "../assets/backgroundLogin.jpg";
 import logo from "../assets/logo.png";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { addDoc, collection } from "firebase/firestore";
+import { database } from "@/services/firebase";
 
 type Inputs = {
   email: string;
@@ -17,12 +19,21 @@ export default function Register() {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm();
   const router = useRouter();
   const [loadin, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
+  async function handleCreateUser(data: FieldValues) {
+    const date = new Date();
+    const response = await addDoc(collection(database, "user"), {
+      email: data.email,
+      uid: data.uid,
+      created_at: String(date),
+    });
+    console.log("response", response)
+  }
 
   const onSubmit: SubmitHandler<FieldValues> = async (data: FieldValues) => {
     const { email, password } = data as Inputs;
@@ -33,7 +44,9 @@ export default function Register() {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
-          console.log(user);
+          if(user){
+            handleCreateUser(user)
+          }
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -43,7 +56,7 @@ export default function Register() {
       setLoading(false);
       setError(false);
       window.alert("Usuário cdastrado com sucesso!!");
-      router.push("/dashboard");
+      router.push("/");
     } catch (error) {
       setError(true);
       setLoading(false);
