@@ -157,7 +157,7 @@ export default function Dashboard({ events }: EventsProps) {
             </DialogPortal>
           </Dialog>
 
-          {data.map(({ id, name, date }: any) => {
+          {data?.map(({ id, name, date }: any) => {
             return (
               <Link
                 className="shadow-xl shadow-green-800 text-gray-100 flex justify-center items-center w-56 h-56 rounded-md"
@@ -186,13 +186,25 @@ export default function Dashboard({ events }: EventsProps) {
 }
 
 export const getStaticProps: GetStaticProps<DashboardProps> = async () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
-  const response = await api.get("api/getevents")
-  const events = await response.data
-  console.log("events")
-  return {
-    props: {
-      events,
-    },
-  };
+
+  if(process.env.NODE_ENV !== 'development'){
+     // Retorna os dados estáticos diretamente no ambiente de desenvolvimento
+     return {
+      props: {
+        events: []
+      }
+    };
+  }else{
+    const response = await api.get("api/getevents")
+    const events = await response.data
+    console.log("events")
+    return {
+      props: {
+        events,
+      },
+    };
+  }
+    
+  
+
 };
