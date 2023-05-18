@@ -2,14 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
-import { api } from "@/lib/api";
 import { useState } from "react";
 import backgroundLogin from "../assets/backgroundLogin.jpg";
 import logo from "../assets/logo.png";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 type Inputs = {
   email: string;
   password: string;
+  name: string;
 };
 
 export default function Register() {
@@ -27,20 +28,22 @@ export default function Register() {
     const { email, password } = data as Inputs;
     setLoading(true);
     try {
-      const response = await api.post("api/registeruser", {
-        email: email,
-        password: password,
-      });
-      if (response.status === 200) {
-        window.localStorage.setItem(
-          "tokenIngressoPara-v1",
-          response.data.token
-        );
-        setLoading(false);
-        setError(false);
-        window.alert("Usuário cdastrado com sucesso!!");
-        router.push("/dashboard");
-      }
+      const auth = getAuth();
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // ..
+        });
+      setLoading(false);
+      setError(false);
+      window.alert("Usuário cdastrado com sucesso!!");
+      router.push("/dashboard");
     } catch (error) {
       setError(true);
       setLoading(false);

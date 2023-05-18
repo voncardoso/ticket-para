@@ -13,12 +13,19 @@ import {
 } from "@radix-ui/react-dialog";
 import { motion, AnimatePresence } from "framer-motion";
 import { GetStaticProps } from "next";
-import { getDatabase, ref, get, push } from "firebase/database";
 import { database } from "@/services/firebase";
 import { FieldValues, useForm } from "react-hook-form";
+import {
+  collection,
+  onSnapshot,
+  addDoc,
+  doc,
+  getDocs,
+} from "firebase/firestore";
+import { api } from "../../lib/api";
 
 interface EventsProps {
-  events: {
+  data: {
     id: string;
     name: string;
     date: string;
@@ -28,19 +35,22 @@ interface EventsProps {
   };
 }
 
-export default function Dashboard({ events }: EventsProps) {
-  const data: EventsProps[] = events as any;
+type DashboardProps = {
+  data: any; // Defina o tipo de dados esperado para a resposta
+};
+
+export default function Dashboard({ data }: EventsProps) {
+  const events: EventsProps[] = data as any;
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
 
   async function handleCreateEvent(data: FieldValues) {
-    console.log(data);
     const teste = new Date();
-    console.log(teste);
-    const response = await push(ref(database, "event"), {
+    const response = await addDoc(collection(database, "event"), {
       name: data.name,
       date: data.date,
       hours: data.hours,
@@ -48,7 +58,10 @@ export default function Dashboard({ events }: EventsProps) {
       description: data.description,
     });
 
-    console.log("response", response);
+    if (response) {
+      window.alert("Evento cadastrado com sucesso");
+      reset();
+    }
   }
 
   return (
@@ -144,8 +157,7 @@ export default function Dashboard({ events }: EventsProps) {
             </DialogPortal>
           </Dialog>
 
-          {data.map(({ id, name, date }: any) => {
-            console.log(id);
+          {events?.map(({ id, name, date }: any) => {
             return (
               <Link
                 className="shadow-xl shadow-green-800 text-gray-100 flex justify-center items-center w-56 h-56 rounded-md"
@@ -173,24 +185,18 @@ export default function Dashboard({ events }: EventsProps) {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
-  const response = ref(database, "event");
-  let events = [] as any;
-  try {
-    const snapshot = await get(response);
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      console.log("foi", data);
-      events = Object.keys(data).map((id) => ({ id, ...data[id] }));
-      // Faça o que for necessário com os dados lidos, como exibir em uma lista
-    } else {
-      console.log("Nenhum dado encontrado");
-    }
-  } catch (error) {}
+export const getStaticProps: GetStaticProps<DashboardProps> = async () => {
 
-  return {
-    props: {
-      events,
-    },
-  };
+  const collectionRef = collection(database, "event");
+  const querySnapshot = await getDocs(collectionRef);
+  const data = querySnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  }));
+
+    return {
+      props: {
+        data,
+      },
+    };
 };

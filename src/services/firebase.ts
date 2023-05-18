@@ -4,6 +4,7 @@ import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 import admin from "../../firebase-admin-config";
 import { init } from "next-firebase-auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -23,5 +24,5 @@ if (!getApps.length) {
 }
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const database = getDatabase();
+const database = getFirestore();
 export { app, auth, database };
