@@ -1,5 +1,10 @@
 import Sidbar from "@/components/sidbar";
-import { PlusCircle, MagnifyingGlass, X } from "@phosphor-icons/react";
+import {
+  PlusCircle,
+  MagnifyingGlass,
+  X,
+  TrashSimple,
+} from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";
 import ImgEvent from "../../assets/img-show.jpg";
@@ -41,7 +46,7 @@ export default function Dashboard({ data }: EventsProps) {
     control,
   } = useForm({
     defaultValues: {
-      typeTicket: [{ type: "" }],
+      typeTicket: [{ type: "", amount: "" }],
       name: "",
       date: "",
       hours: "",
@@ -111,7 +116,7 @@ export default function Dashboard({ data }: EventsProps) {
                   x: { duration: 0.5 },
                 }}
               >
-                <DialogContent className="overflow-y-auto  mx-px-4 text-white bg-gray-400 z-20 w-96 h-5/6 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md  shadow-green-50">
+                <DialogContent className="overflow-y-auto  mx-px-4 text-white bg-gray-400 z-20 w-1/3 h-5/6 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md  shadow-green-50">
                   <header className="pt-5 px-5 flex justify-between">
                     <h1 className="text-xl text font-bold">Cadastrar Evento</h1>
                     <DialogClose asChild>
@@ -153,20 +158,47 @@ export default function Dashboard({ data }: EventsProps) {
                     </label>
 
                     <div className="flex flex-col w-full  ">
-                      Tipo de Ingresso
+                      <label htmlFor="" className="border-b-2">
+                        Ingressos
+                      </label>
                       {typeTicketFields.map((field, index) => (
-                        <label
-                          key={field.id}
-                          className="mt-2 flex flex-col w-full  "
-                          htmlFor=""
-                        >
-                          <input
-                            className="p-2 roudend rounded-md mt-1 text-black"
-                            type="text"
-                            defaultValue={field.type}
-                            {...register(`typeTicket.${index}.type`)}
-                          />
-                        </label>
+                        <>
+                          <label
+                            key={field.id}
+                            className="mt-4 flex flex-col w-full  "
+                            htmlFor=""
+                          >
+                            Tipo {index + 1}
+                            <input
+                              className="p-2 roudend rounded-md mt-1 text-black"
+                              type="text"
+                              defaultValue={field.type}
+                              {...register(`typeTicket.${index}.type`)}
+                            />
+                          </label>
+
+                          <label
+                            key={field.id}
+                            className="mt-2 flex flex-col w-full  "
+                            htmlFor=""
+                          >
+                            Valor {index + 1}
+                            <input
+                              className="p-2 roudend rounded-md mt-1 text-black"
+                              type="text"
+                              defaultValue={field.type}
+                              {...register(`typeTicket.${index}.amount`)}
+                            />
+                          </label>
+                          <button
+                            className="mt-2 text-red-500 flex gap-1 text-left w-32 items-center hover:text-red-500"
+                            type="button"
+                            onClick={() => typeTicketRemove(index)}
+                          >
+                            <TrashSimple className="text-red-500" size={22} />{" "}
+                            Remover
+                          </button>
+                        </>
                       ))}
                     </div>
                     <button
@@ -175,6 +207,7 @@ export default function Dashboard({ data }: EventsProps) {
                       onClick={() =>
                         typeTicketAppend({
                           type: "",
+                          amount: "",
                         })
                       }
                     >

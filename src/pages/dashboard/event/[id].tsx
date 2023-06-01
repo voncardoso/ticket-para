@@ -1,35 +1,37 @@
 import Sidbar from "@/components/sidbar";
-import { Dialog,
+import {
+  Dialog,
   DialogTrigger,
   DialogOverlay,
   DialogContent,
   DialogPortal,
-  DialogClose, } from "@radix-ui/react-dialog";
+  DialogClose,
+} from "@radix-ui/react-dialog";
 import { motion } from "framer-motion";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
-import { X } from "@phosphor-icons/react";
-import { randomBytes } from 'crypto';
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import { Checks, X, XCircle } from "@phosphor-icons/react";
+import { randomBytes } from "crypto";
+import { addDoc, collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { database } from "@/services/firebase";
 import { GetStaticPaths, GetStaticProps } from "next";
+import { useEffect, useState } from "react";
 
-interface ticketProps  {
-
-    amount: string, 
-    date: string
-    event_id: string,
-    hash_id: string,
-    id: string
-    type: string
-  
+interface ticketProps {
+  amount: string;
+  date: string;
+  event_id: string;
+  hash_id: string;
+  id: string;
+  type: string;
+  checked: true | false;
 }
 
 interface EventsProps {
-  data: []
+  data: [];
 }
 
-export default function Event({data} : EventsProps) {
+export default function Event({ data }: EventsProps) {
   const router = useRouter();
   const { id } = router.query;
   const {
@@ -37,41 +39,66 @@ export default function Event({data} : EventsProps) {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    setValue,
   } = useForm();
-  const tickets = data?.filter((item: any) => item.event_id === id)
+  const [dataEvent, setDataEvent] = useState<any>([]);
+  const tickets = data?.filter((item: any) => item.event_id === id);
 
-  console.log("ticket",tickets)
+  useEffect(() => {
+    async function GetEvent() {
+      const docRef = doc(database, "event", `${id}`);
+      const docSnap = await getDoc(docRef);
+      const data = docSnap.data();
+      setDataEvent(data);
+    }
+    GetEvent();
+  }, [id]);
+
+  console.log("ticket", tickets);
+  console.log("evento", dataEvent);
   // function para gerar hash
   function createSHA256Hash() {
     const randomBytesLength = 16; // Comprimento em bytes do hash desejado
     const randomBytesBuffer = randomBytes(randomBytesLength);
-    const randomHash = randomBytesBuffer.toString('hex');
+    const randomHash = randomBytesBuffer.toString("hex");
     return randomHash;
   }
 
-
-
-  async function handleCreateTicket(data: any){
+  async function handleCreateTicket(data: any) {
     const tickt = {
       amount: data.amount,
       type: data.type,
       date: new Date().toISOString(),
       event_id: id,
-      hash_id: createSHA256Hash()
+      hash_id: createSHA256Hash(),
+      checked: false,
+    };
+
+    let response = {};
+    for (let i = 0; i < data.quantity; i++) {
+      response = await addDoc(collection(database, "ticket"), tickt);
     }
-    const response = await addDoc(collection(database, "ticket"), tickt);
-    
-    if(response){
-      window.alert("Ingresso cadastrado com sucesso")
-      reset()
+
+    if (response) {
+      window.alert("Ingressos cadastrado com sucesso");
+      reset();
     }
   }
+
+  const dateEvent = new Date(dataEvent?.date);
+
   return (
     <section className="flex bg-background h-screen gap-5">
       <Sidbar />
       <div className="w-full h-screen overflow-y-auto">
         <header>
-          <h1 className="p-2 text-2xl text-white">Nome do Evento | Data do evento</h1>
+          <h1 className="p-2 pt-4 text-2xl text-white">
+            {dataEvent?.name} |{" "}
+            {dateEvent.toLocaleDateString("pt-BR", {
+              timeZone: "UTC",
+            })}
+          </h1>
         </header>
         <div className="p-4 text-center text-white">Grafico de ingressos</div>
         <header className="p-4 flex justify-end">
@@ -80,6 +107,7 @@ export default function Event({data} : EventsProps) {
               Cadastrar Ingresso
             </DialogTrigger>
             <DialogPortal>
+              <DialogOverlay className=" fixed inset-0 bg-black bg-opacity-50" />
               <motion.div
                 className="modal "
                 initial={{ opacity: 0, y: 0, x: 0 }}
@@ -90,9 +118,11 @@ export default function Event({data} : EventsProps) {
                   x: { duration: 0.5 },
                 }}
               >
-                 <DialogContent className=" mx-px-4 text-white bg-gray-400 z-20 w-96  fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md  shadow-green-50">
+                <DialogContent className=" mx-px-4 text-white bg-gray-400 z-20 w-96  fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md  shadow-green-50">
                   <header className="pt-5 px-5 flex justify-between">
-                    <h1 className="text-xl text font-bold">Cadastrar Ingresso</h1>
+                    <h1 className="text-xl text font-bold">
+                      Cadastrar Ingresso
+                    </h1>
                     <DialogClose asChild>
                       <button className="relative bottom-2">
                         <X />
@@ -105,23 +135,52 @@ export default function Event({data} : EventsProps) {
                     onSubmit={handleSubmit(handleCreateTicket)}
                   >
                     <label className="flex flex-col w-full  " htmlFor="">
-                      Valor
-                      <input
+                      Tipo de ingresso
+                      <select
+                        id=""
                         className="p-2 roudend rounded-md mt-1 text-black"
-                        type="text"
-                        {...register("amount")}
-                      />
+                        {...register("type", { required: true })}
+                      >
+                        <option value="">Selecione a Malha</option>
+                        {dataEvent?.typeTicket?.map((item: any) => {
+                          console.log(item);
+                          return (
+                            <>
+                              <option value={item.type}>{item.type}</option>
+                            </>
+                          );
+                        })}
+                      </select>
                     </label>
 
-                    <label className="flex flex-col w-full  " htmlFor="">
-                      Tipo
-                      <input
-                        className="p-2 roudend rounded-md mt-1 text-black"
-                        type="text"
-                        {...register("type")}
-                      />
+                    <label className="flex flex-col w-full" htmlFor="">
+                      {dataEvent?.typeTicket?.map((item: any) => {
+                        if (watch("type") === item.type) {
+                          setValue("amount", item.amount);
+                          return (
+                            <>
+                              Valor
+                              <input
+                                className="p-2 roudend rounded-md mt-1 text-black"
+                                defaultValue={item.amount}
+                                {...register("amount", { required: true })}
+                              />
+                            </>
+                          );
+                        }
+                      })}
                     </label>
 
+                    {watch("type") && (
+                      <label className="flex flex-col w-full  " htmlFor="">
+                        Quantidade de Ingresso
+                        <input
+                          className="p-2 roudend rounded-md mt-1 text-black"
+                          type="number"
+                          {...register("quantity")}
+                        />
+                      </label>
+                    )}
                     <button className="mt-1 text-white w-full bg-green-300 p-3 rounded-md cursor-pointer hover:bg-green-100 transition duration-500">
                       Cadastrar
                     </button>
@@ -140,30 +199,41 @@ export default function Event({data} : EventsProps) {
                 <th className="p-2 ">Valor</th>
                 <th className="p-2 ">Tipo</th>
                 <th className="p-2 "></th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
-              {tickets?.map((ticket: ticketProps, index ) =>{
+              {tickets?.map((ticket: ticketProps, index) => {
                 // format date
-                 let dataString = ticket.date;
-                 const data = new Date(dataString);
-                 const dataUTC = data.toLocaleDateString("pt-BR", {
-                   timeZone: "UTC",
-                 });
-                return(
-                  <tr key={ticket.hash_id}  className="bg-gray-300 text-white border-b-2 border-gray-400 cursor-pointer hover:opacity-75">
+                let dataString = ticket.date;
+                const data = new Date(dataString);
+                const dataUTC = data.toLocaleDateString("pt-BR", {
+                  timeZone: "UTC",
+                });
+                return (
+                  <tr
+                    key={ticket.hash_id}
+                    className="bg-gray-300 text-white border-b-2 border-gray-400 cursor-pointer hover:opacity-75"
+                  >
                     <td className="p-2">{index + 1}</td>
                     <td className="p-2">{dataUTC}</td>
                     <td className="p-2">{ticket.amount}</td>
                     <td className="p-2">{ticket.type}</td>
                     <td className="p-2"></td>
+                    <td>
+                      {ticket.checked ? (
+                        <Checks className="text-green-300" size={30} />
+                      ) : (
+                        <XCircle className="text-red-600" size={28} />
+                      )}
+                    </td>
                   </tr>
-                )
+                );
               })}
-      
+
               <tr className=" bg-gray-400  border-b-2 border-gray-400 ">
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className="p-2 rounded-ee-md rounded-es-md"
                 ></td>
               </tr>
@@ -175,27 +245,23 @@ export default function Event({data} : EventsProps) {
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () =>{
+export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths: [
-      {params: {id: "UuFKnMBdN84meKjwK6Er"}}
-    ],
-    fallback: true
-  }
-}
-
+    paths: [{ params: { id: "UuFKnMBdN84meKjwK6Er" } }],
+    fallback: true,
+  };
+};
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  
   const collectionRef = collection(database, "ticket");
   const querySnapshot = await getDocs(collectionRef);
   const data = querySnapshot.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
   }));
-    return {
-      props: {
-        data,
-      },
-    };
+  return {
+    props: {
+      data,
+    },
+  };
 };
