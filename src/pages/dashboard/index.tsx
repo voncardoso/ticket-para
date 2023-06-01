@@ -1,5 +1,10 @@
 import Sidbar from "@/components/sidbar";
-import { PlusCircle, MagnifyingGlass, X } from "@phosphor-icons/react";
+import {
+  PlusCircle,
+  MagnifyingGlass,
+  X,
+  TrashSimple,
+} from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";
 import ImgEvent from "../../assets/img-show.jpg";
@@ -14,7 +19,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { GetStaticProps } from "next";
 import { database } from "@/services/firebase";
-import { FieldValues, useForm } from "react-hook-form";
+import { FieldValues, useFieldArray, useForm } from "react-hook-form";
 import {
   collection,
   onSnapshot,
@@ -26,37 +31,41 @@ import { useContext } from "react";
 import { UserContextLogin } from "@/Context/useContextLogin";
 
 interface EventsProps {
-  data: []
+  data: [];
 }
 
-interface Treste  {
-    id: string;
-    name: string;
-    date: string;
-    hours: string;
-    created_at: string;
-    description: string;
-    uid: string
-}
-
-type DashboardProps = {
-  data: any; // Defina o tipo de dados esperado para a resposta
-};
-
-export default function Dashboard( {data} : EventsProps) {
-  const {dataUser} = useContext(UserContextLogin)
-  console.log(data)
-  const events = data.filter((item: any) => item.uid === dataUser)
+export default function Dashboard({ data }: EventsProps) {
+  const { dataUser } = useContext(UserContextLogin);
+  const events = data.filter((item: any) => item.uid === dataUser);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm();
+    control,
+  } = useForm({
+    defaultValues: {
+      typeTicket: [{ type: "", amount: "" }],
+      name: "",
+      date: "",
+      hours: "",
+      description: "",
+    },
+  });
+
+  const {
+    fields: typeTicketFields,
+    append: typeTicketAppend,
+    remove: typeTicketRemove,
+  } = useFieldArray({
+    control,
+    name: "typeTicket",
+  });
 
   async function handleCreateEvent(data: FieldValues) {
     const date = new Date().toISOString();
+    console.log(data);
     const response = await addDoc(collection(database, "event"), {
       name: data.name,
       date: data.date,
@@ -64,6 +73,7 @@ export default function Dashboard( {data} : EventsProps) {
       created_at: String(date),
       description: data.description,
       uid: dataUser,
+      typeTicket: data.typeTicket,
     });
 
     if (response) {
@@ -89,8 +99,8 @@ export default function Dashboard( {data} : EventsProps) {
         <div className="w-full flex gap-5 flex-wrap">
           <Dialog>
             <DialogTrigger className="text-gray-100 flex justify-center items-center w-56 h-56 border-2 border-gray-100 rounded-md border-dashed">
-              <div>
-                <PlusCircle size={80} />
+              <div className="flex flex-col justify-center">
+                <PlusCircle size={90} />
                 <strong className="mt-2">Criar Evento</strong>
               </div>
             </DialogTrigger>
@@ -106,7 +116,7 @@ export default function Dashboard( {data} : EventsProps) {
                   x: { duration: 0.5 },
                 }}
               >
-                <DialogContent className=" mx-px-4 text-white bg-gray-400 z-20 w-96  fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md  shadow-green-50">
+                <DialogContent className="overflow-y-auto  mx-px-4 text-white bg-gray-400 z-20 w-1/3 h-5/6 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md  shadow-green-50">
                   <header className="pt-5 px-5 flex justify-between">
                     <h1 className="text-xl text font-bold">Cadastrar Evento</h1>
                     <DialogClose asChild>
@@ -146,6 +156,64 @@ export default function Dashboard( {data} : EventsProps) {
                         {...register("hours")}
                       />
                     </label>
+
+                    <div className="flex flex-col w-full  ">
+                      <label htmlFor="" className="border-b-2">
+                        Ingressos
+                      </label>
+                      {typeTicketFields.map((field, index) => (
+                        <>
+                          <label
+                            key={field.id}
+                            className="mt-4 flex flex-col w-full  "
+                            htmlFor=""
+                          >
+                            Tipo {index + 1}
+                            <input
+                              className="p-2 roudend rounded-md mt-1 text-black"
+                              type="text"
+                              defaultValue={field.type}
+                              {...register(`typeTicket.${index}.type`)}
+                            />
+                          </label>
+
+                          <label
+                            key={field.id}
+                            className="mt-2 flex flex-col w-full  "
+                            htmlFor=""
+                          >
+                            Valor {index + 1}
+                            <input
+                              className="p-2 roudend rounded-md mt-1 text-black"
+                              type="text"
+                              defaultValue={field.type}
+                              {...register(`typeTicket.${index}.amount`)}
+                            />
+                          </label>
+                          <button
+                            className="mt-2 text-red-500 flex gap-1 text-left w-32 items-center hover:text-red-500"
+                            type="button"
+                            onClick={() => typeTicketRemove(index)}
+                          >
+                            <TrashSimple className="text-red-500" size={22} />{" "}
+                            Remover
+                          </button>
+                        </>
+                      ))}
+                    </div>
+                    <button
+                      className="flex gap-1 text-center items-center hover:text-gold-400"
+                      type="button"
+                      onClick={() =>
+                        typeTicketAppend({
+                          type: "",
+                          amount: "",
+                        })
+                      }
+                    >
+                      <PlusCircle className="text-gold-400" size={22} />{" "}
+                      Adicionar tipo de ingresso
+                    </button>
 
                     <label className="flex flex-col w-full  " htmlFor="">
                       Descrição
@@ -193,17 +261,17 @@ export default function Dashboard( {data} : EventsProps) {
   );
 }
 
-export const getStaticProps: GetStaticProps<DashboardProps> = async () => {
-  
+export const getStaticProps: GetStaticProps = async () => {
   const collectionRef = collection(database, "event");
   const querySnapshot = await getDocs(collectionRef);
   const data = querySnapshot.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
   }));
-    return {
-      props: {
-        data,
-      },
-    };
+
+  return {
+    props: {
+      data,
+    },
+  };
 };
