@@ -8,11 +8,17 @@ import { Dialog,
 import { motion } from "framer-motion";
 import { useRouter } from 'next/router';
 import { useForm } from "react-hook-form";
-import { X } from "@phosphor-icons/react";
+import { Ticket, X } from "@phosphor-icons/react";
 import { randomBytes } from 'crypto';
 import { addDoc, collection, getDocs } from "firebase/firestore";
 import { database } from "@/services/firebase";
 import { GetStaticPaths, GetStaticProps } from "next";
+import QRCode from "qrcode";
+import { getStorage, ref} from "firebase/storage";
+import { doc,updateDoc,arrayUnion } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { app } from "@/services/firebase";
 
 interface ticketProps  {
 
@@ -65,7 +71,22 @@ export default function Event({data} : EventsProps) {
       window.alert("Ingresso cadastrado com sucesso")
       reset()
     }
+    const ok = tickt.hash_id;
+    insertQRCode(ok)
   }
+ 
+  //Função prototipo para incluir a url do ingresso (gerar QRCode com ela)
+  //Não encontra a refencia do banco, tempo?
+  async function insertQRCode(id: any){
+    const db = getFirestore(app);
+    const refid = id;
+    const washingtonRef = doc(db, "ticket","refid");
+    await updateDoc(washingtonRef, {
+      QRCode: arrayUnion("Inserir QR Code")
+    });
+    setTimeout(insertQRCode, 130000000)
+  }
+
   return (
     <section className="flex bg-background h-screen gap-5">
       <Sidbar />
