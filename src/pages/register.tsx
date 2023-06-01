@@ -20,6 +20,7 @@ export default function Register() {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
   const router = useRouter();
   const [loadin, setLoading] = useState(false);
@@ -32,7 +33,7 @@ export default function Register() {
       uid: data.uid,
       created_at: String(date),
     });
-    console.log("response", response)
+    console.log("response", response);
   }
 
   const onSubmit: SubmitHandler<FieldValues> = async (data: FieldValues) => {
@@ -44,8 +45,8 @@ export default function Register() {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
-          if(user){
-            handleCreateUser(user)
+          if (user) {
+            handleCreateUser(user);
           }
         })
         .catch((error) => {
