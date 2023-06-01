@@ -16,6 +16,7 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import { useState } from "react";
 import QRCode from "react-qr-code";
 import { increment } from "firebase/database";
+import QrScanner from 'qr-scanner'; 
 
 interface ticketProps  {
 
@@ -42,6 +43,7 @@ export default function Event({data} : EventsProps) {
   const [nomeClinete,setNomeCliente] = useState() 
   const [cpfCliente,setcpfCliente] = useState() 
   const [formaPagamento,setFormaPagamento] = useState() 
+  const [result,setResult] = useState("")
 
   //Salvar QRCode
   const ImprimirIgresso = () => {
@@ -116,6 +118,17 @@ export default function Event({data} : EventsProps) {
       reset()
     }
   }
+
+  const lerQrcode  = (e  :any ) => {
+    const file = e.target.files[0];
+    if (!file) {
+        return;
+    }
+    QrScanner.scanImage(file, { returnDetailedScanResult: true })
+        .then(result => setResult(result.data))
+        .catch(e => console.log(e));
+
+  }
   return (
     <section className="flex bg-background h-screen gap-5">
       <div>
@@ -130,6 +143,10 @@ export default function Event({data} : EventsProps) {
           <input type="text" placeholder="Forma de Pagamento" onChange={(e) =>setFormaPagamento(e.target.value)}></input><br></br>
           <button type ="submit">Cadastrar</button>
         </form>
+
+        <h3>Ler QRCode</h3>
+        <input type="file" onChange={(e) => lerQrcode(e)}></input><br></br><br></br>
+        <p>Dados do QRCode: {result}</p>
       </div>
       
        
