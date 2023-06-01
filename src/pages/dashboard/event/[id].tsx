@@ -7,12 +7,15 @@ import { Dialog,
   DialogClose, } from "@radix-ui/react-dialog";
 import { motion } from "framer-motion";
 import { useRouter } from 'next/router';
-import { useForm } from "react-hook-form";
-import { X } from "@phosphor-icons/react";
+import { useForm, useFormState } from "react-hook-form";
+import { Download, X } from "@phosphor-icons/react";
 import { randomBytes } from 'crypto';
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import { addDoc, and, collection, getDocs } from "firebase/firestore";
 import { database } from "@/services/firebase";
 import { GetStaticPaths, GetStaticProps } from "next";
+import { useState } from "react";
+import QRCode from "react-qr-code";
+import { increment } from "firebase/database";
 
 interface ticketProps  {
 
@@ -30,6 +33,53 @@ interface EventsProps {
 }
 
 export default function Event({data} : EventsProps) {
+  //gerar QRCode
+  const [nomeEvento,setNomeEvento] = useState()
+  const [dataEvento,setDataEvento] = useState()
+  const [horaEvento,setHoraEventoset] = useState() 
+  const [descricaoEvento,setdescricaoEvento] = useState() 
+  const [valorIngresso,setvalorIngresso] = useState() 
+  const [nomeClinete,setNomeCliente] = useState() 
+  const [cpfCliente,setcpfCliente] = useState() 
+  const [formaPagamento,setFormaPagamento] = useState() 
+
+  //Salvar QRCode
+  const ImprimirIgresso = () => {
+    const svg = document.getElementById("QRCode");
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const pngFile = canvas.toDataURL("image/png");
+      const downloadLink = document.createElement("a");
+      
+      //Nome Da imagem
+      downloadLink.download = `${"Ingresso"}`;
+      //downloadLink.download = `${"ingresso"}`;
+      downloadLink.href = `${pngFile}`;
+      downloadLink.click();
+    }
+    img.src = `data:image/svg+xml;base64,${btoa(svgData)}`
+    
+    //const db = getDatabase(app);
+    event.preventDefault()
+    addDoc(collection(database, "ingressos"), {
+      nome_evento: nomeEvento,
+      data_evento: dataEvento,
+      horaEvento: horaEvento,
+      descricaoEvento: descricaoEvento,
+      valorIngresso: valorIngresso,
+      nomeClinete: nomeClinete,
+      cpfCliente : cpfCliente,
+      formaPagamento : formaPagamento,
+      QRCode : img.src
+    });
+  }
+
   const router = useRouter();
   const { id } = router.query;
   const {
@@ -68,6 +118,34 @@ export default function Event({data} : EventsProps) {
   }
   return (
     <section className="flex bg-background h-screen gap-5">
+      <div>
+        <form onSubmit={ImprimirIgresso} >
+          <input type="text" placeholder="Nome do Evento" onChange={(e) =>setNomeEvento(e.target.value)}></input><br></br>
+          <input type="text" placeholder="Data do Evento" onChange={(e) =>setDataEvento(e.target.value)}></input><br></br>
+          <input type="text" placeholder="Hora do evento" onChange={(e) =>setHoraEventoset(e.target.value)}></input><br></br>
+          <input type="text" placeholder="Descrição do evento" onChange={(e) =>setdescricaoEvento(e.target.value)}></input><br></br>
+          <input type="text" placeholder="Valor do Ingresso" onChange={(e) =>setvalorIngresso(e.target.value)}></input><br></br>
+          <input type="text" placeholder="Nome do cliente" onChange={(e) =>setNomeCliente(e.target.value)}></input><br></br>
+          <input type="text" placeholder="CPF do cliente" onChange={(e) =>setcpfCliente(e.target.value)}></input><br></br>
+          <input type="text" placeholder="Forma de Pagamento" onChange={(e) =>setFormaPagamento(e.target.value)}></input><br></br>
+          <button type ="submit">Cadastrar</button>
+        </form>
+      </div>
+      
+       
+      <div style={{ height: "auto", margin: "0 auto", maxWidth: 64, width: "100%" }}>
+          <QRCode
+          size={256}
+          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+          value = {nomeEvento + dataEvento + horaEvento + descricaoEvento + valorIngresso + nomeClinete + cpfCliente + formaPagamento}
+          //value2={inputValue2}
+          viewBox={`0 0 256 256`}
+          id="QRCode"
+          ></QRCode>
+      </div>
+
+      
+
       <Sidbar />
       <div className="w-full h-screen overflow-y-auto">
         <header>
