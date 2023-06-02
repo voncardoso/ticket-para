@@ -53,7 +53,7 @@ export default function Home() {
           className=" w-full max-w-full  mx-auto grid grid-cols p-4"
         >
           <Image
-            className="mx-auto w-52 relative bottom-20"
+            className="mx-auto w-52 relative bottom-15"
             src={logo}
             alt="logo do site"
           />
