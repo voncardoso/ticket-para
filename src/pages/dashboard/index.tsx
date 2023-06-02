@@ -4,6 +4,8 @@ import {
   MagnifyingGlass,
   X,
   TrashSimple,
+  Clock,
+  CalendarBlank,
 } from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -81,27 +83,17 @@ export default function Dashboard({ data }: EventsProps) {
       reset();
     }
   }
-
+  console.log(events);
   return (
     <section className="flex bg-background h-screen gap-5">
       <Sidbar />
       <div className="w-full h-screen overflow-y-auto">
         <header className="flex justify-end p-4 ">
-          <label className="flex gap-2 bg-gray-400 p-2 rounded-md" htmlFor="">
-            <MagnifyingGlass className="text-gray-100" size={24} />
-            <input
-              className="bg-gray-400"
-              type="text"
-              placeholder="Pesquisar"
-            />
-          </label>
-        </header>
-        <div className="w-full flex gap-5 flex-wrap">
           <Dialog>
-            <DialogTrigger className="text-gray-100 flex justify-center items-center w-56 h-56 border-2 border-gray-100 rounded-md border-dashed">
-              <div className="flex flex-col justify-center">
-                <PlusCircle size={90} />
-                <strong className="mt-2">Criar Evento</strong>
+            <DialogTrigger className="bg-green-400 opacity-75 py-1 px-4 rounded font-font-medium rounded-sm text-white hover:opacity-95">
+              <div className="flex justify-center items-center gap-2">
+                <PlusCircle size={22} />
+                <strong className="">Criar Evento</strong>
               </div>
             </DialogTrigger>
             <DialogPortal>
@@ -232,24 +224,38 @@ export default function Dashboard({ data }: EventsProps) {
               </motion.div>
             </DialogPortal>
           </Dialog>
+        </header>
 
-          {events?.map(({ id, name, date }: any) => {
+        <div className="w-full mt-4 flex gap-5 flex-wrap">
+          {events?.map(({ id, name, date, hours }: any) => {
+            const dateEvent = new Date(date);
             return (
               <Link
-                className="shadow-xl shadow-green-800 text-gray-100 flex justify-center items-center w-56 h-56 rounded-md"
+                className="transition hover:opacity-75 duration-200 bg-gray-300 max-w-md w-full shadow-xl shadow-green-800 text-gray-100 flex justify-center items-center rounded-md"
                 href={`/dashboard/event/${id}`}
                 key={id}
               >
-                <div className="h-full w-full">
+                <div className="h-full w-full flex">
                   <Image
-                    className="h-full w-full rounded-md transition duration-200 opacity-50 hover:opacity-25"
+                    className="p-2 h-full w-36 rounded-md  opacity-50 "
                     src={ImgEvent}
                     quality={100}
                     alt=""
                   />
-                  <div className="mx-auto rounded-md w-11/12 relative bottom-14 text-center text-white bg-green-400  text-white">
+                  <div className="w-full flex flex-col justify-between  p-2 text-white">
                     <p>{name}</p>
-                    <p>{date}</p>
+                    <div className="flex justify-between">
+                      <p className="flex items-center gap-2">
+                        <Clock className="text-green-300" size={18} />
+                        {hours}
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <CalendarBlank className="text-green-300" size={18} />
+                        {dateEvent.toLocaleDateString("pt-BR", {
+                          timeZone: "UTC",
+                        })}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </Link>
