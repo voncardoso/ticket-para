@@ -67,7 +67,6 @@ export default function Dashboard({ data }: EventsProps) {
 
   async function handleCreateEvent(data: FieldValues) {
     const date = new Date().toISOString();
-    console.log(data);
     const response = await addDoc(collection(database, "event"), {
       name: data.name,
       date: data.date,
@@ -83,7 +82,7 @@ export default function Dashboard({ data }: EventsProps) {
       reset();
     }
   }
-  console.log(events);
+
   return (
     <section className="flex bg-background h-screen gap-5">
       <Sidbar />

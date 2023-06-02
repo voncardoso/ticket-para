@@ -7,10 +7,11 @@ import {
   DialogPortal,
   DialogClose,
 } from "@radix-ui/react-dialog";
+import QRCodeLink from "qrcode";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
-import { Checks, X, XCircle } from "@phosphor-icons/react";
+import { Checks, QrCode, Ticket, X, XCircle } from "@phosphor-icons/react";
 import { randomBytes } from "crypto";
 import { addDoc, collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { database } from "@/services/firebase";
@@ -44,6 +45,7 @@ export default function Event({ data }: EventsProps) {
   } = useForm();
   const [dataEvent, setDataEvent] = useState<any>([]);
   const tickets = data?.filter((item: any) => item.event_id === id);
+  const [ImageQrCode, setImageQrCode] = useState("");
 
   useEffect(() => {
     async function GetEvent() {
@@ -87,6 +89,25 @@ export default function Event({ data }: EventsProps) {
   }
 
   const dateEvent = new Date(dataEvent?.date);
+
+  function geradorQRCODE(tikect: any) {
+    console.log("qr", tikect);
+    let imgQrCode = "";
+    let countString = JSON.stringify(tikect.hash_id);
+
+    QRCodeLink.toDataURL(
+      countString,
+      {
+        width: 400,
+        margin: 3,
+      },
+      function (err, url) {
+        imgQrCode = url;
+      }
+    );
+
+    setImageQrCode(imgQrCode);
+  }
 
   return (
     <section className="flex bg-background h-screen gap-5">
@@ -141,7 +162,7 @@ export default function Event({ data }: EventsProps) {
                         className="p-2 roudend rounded-md mt-1 text-black"
                         {...register("type", { required: true })}
                       >
-                        <option value="">Selecione a Malha</option>
+                        <option value="">Selecione o ingresso</option>
                         {dataEvent?.typeTicket?.map((item: any) => {
                           console.log(item);
                           return (
@@ -219,7 +240,46 @@ export default function Event({ data }: EventsProps) {
                     <td className="p-2">{dataUTC}</td>
                     <td className="p-2">{ticket.amount}</td>
                     <td className="p-2">{ticket.type}</td>
-                    <td className="p-2"></td>
+                    <td
+                      className="p-2"
+                      onClick={() => {
+                        geradorQRCODE(ticket);
+                      }}
+                    >
+                      <Dialog>
+                        <DialogTrigger className="text-white opacity-75 py-1 px-4 rounded font-font-medium rounded-sm text-white hover:opacity-95">
+                          <QrCode weight="duotone" size={22} />
+                        </DialogTrigger>
+
+                        <DialogPortal>
+                          <DialogOverlay className=" fixed inset-0 bg-black bg-opacity-50" />
+                          <DialogContent className="p-4 mx-px-4 text-white bg-gray-400 z-20   fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md  shadow-green-50">
+                            <DialogClose asChild>
+                              <button className="relative bottom-2">
+                                <X />
+                              </button>
+                            </DialogClose>
+
+                            <div className="p-4 w-8xl roudend rounded-md flex bg-gradient-to-b from-blue-500 to-purple-500 gap-10">
+                              <div className="w-full">
+                                <strong>Nome do evento</strong>
+                                <p>Tipo do ingresso: {ticket.type}</p>
+                              </div>
+                              <img className="w-32" src={ImageQrCode} alt="" />
+                            </div>
+                            <div className="w-full flex justify-center">
+                              <a
+                                className="p-2"
+                                href={ImageQrCode}
+                                download={`qrcode_N=.png`}
+                              >
+                                Baixar ingresso
+                              </a>
+                            </div>
+                          </DialogContent>
+                        </DialogPortal>
+                      </Dialog>
+                    </td>
                     <td>
                       {ticket.checked ? (
                         <Checks className="text-green-300" size={30} />
