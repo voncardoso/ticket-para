@@ -12,19 +12,34 @@ export default async function handler(
   const page = await browser.newPage();
 
   // Acesse a URL que você deseja converter em PDF
-  await page.goto("http://localhost:3000/");
+  await page.goto("http://localhost:3000");
 
   // Localize os campos de login e senha e preencha com as informações corretas
-  // await page.waitForSelector("#email", { timeout: 60000 });
-  //await page.type("#email", "teste@teste.com");
-  //await page.type('input[type="password"]', "123456");
+  await page.waitForSelector("#email", { timeout: 60000 });
+  await page.type("#email", "teste@teste.com");
+  await page.type("#password", "123456");
 
   // Envie o formulário de login
-  // await page.click('button[type="submit"]');
+  await page.click('button[type="submit"]');
 
   // Aguarde o redirecionamento após o login (opcional)
 
+  await page.waitForNavigation();
+
+  const isLoggedIn = await page.evaluate(() => {
+    const dashboardElement = document.querySelector(".dashboard");
+    return !!dashboardElement;
+  });
+
+  if (!isLoggedIn) {
+    console.log("Falha no login. Verifique as informações de login.");
+    await browser.close();
+    return;
+  }
+
   // Gere o PDF
+  await page.goto("http://localhost:3000/dashboard");
+  await page.waitForNavigation();
   const pdf = await page.pdf({ format: "A4", preferCSSPageSize: true });
 
   // Encerre o navegador

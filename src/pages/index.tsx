@@ -88,7 +88,10 @@ export default function Home() {
               Entrando...
             </button>
           ) : (
-            <button className="text-white text-xl mt-8 bg-green-300 p-3 rounded-md cursor-pointer hover:bg-green-100 transition duration-500">
+            <button
+              type="submit"
+              className="text-white text-xl mt-8 bg-green-300 p-3 rounded-md cursor-pointer hover:bg-green-100 transition duration-500"
+            >
               Entrar
             </button>
           )}
