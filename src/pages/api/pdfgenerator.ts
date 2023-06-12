@@ -26,19 +26,8 @@ export default async function handler(
 
   await page.waitForNavigation();
 
-  const isLoggedIn = await page.evaluate(() => {
-    const dashboardElement = document.querySelector(".dashboard");
-    return !!dashboardElement;
-  });
-
-  if (!isLoggedIn) {
-    console.log("Falha no login. Verifique as informações de login.");
-    await browser.close();
-    return;
-  }
-
   // Gere o PDF
-  await page.goto("http://localhost:3000/dashboard");
+  await page.goto("http://localhost:3000/dashboard/event/ticket/1");
   await page.waitForNavigation();
   const pdf = await page.pdf({ format: "A4", preferCSSPageSize: true });
 
