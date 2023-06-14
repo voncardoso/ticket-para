@@ -14,7 +14,7 @@ export default async function handler(
   const page = await browser.newPage();
 
   // Acesse a URL que você deseja converter em PDF
-  await page.goto("http://localhost:3000");
+  await page.goto("https://ticket-para.vercel.app/");
 
   // Localize os campos de login e senha e preencha com as informações corretas
   await page.waitForSelector("#email", { timeout: 60000 });
@@ -29,7 +29,9 @@ export default async function handler(
   await page.waitForNavigation();
 
   // Gere o PDF
-  await page.goto(`http://localhost:3000/dashboard/event/ticket/${id}`);
+  await page.goto(
+    `https://ticket-para.vercel.app/dashboard/event/ticket/${id}`
+  );
 
   await page.waitForSelector("#tickte", { timeout: 60000 });
 

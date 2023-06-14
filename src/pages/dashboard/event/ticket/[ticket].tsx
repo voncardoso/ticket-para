@@ -14,7 +14,7 @@ interface EventsProps {
 
 export default function TicketPdf({ data }: EventsProps) {
   console.log(data);
-  if (data !== null) {
+  if (data?.amount) {
     return (
       <section id="tickte">
         <div
