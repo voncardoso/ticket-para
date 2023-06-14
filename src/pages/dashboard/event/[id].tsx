@@ -288,7 +288,7 @@ export default function Event({ data }: EventsProps) {
                               </div>
                               <img className="w-32" src={ImageQrCode} alt="" />
                             </div>
-                            <div className="w-full flex justify-center">
+                            <div className="w-full flex justify-center cursor-pointer">
                               <a
                                 className="p-2"
                                 onClick={() => {
