@@ -13,20 +13,7 @@ interface EventsProps {
 }
 
 export default function TicketPdf({ data }: EventsProps) {
-  const router = useRouter();
-  const { ticket } = router.query;
-  const [dataTicket, setDataTicket] = useState<any>([]);
-
-  useEffect(() => {
-    async function GetEvent() {
-      const docRef = doc(database, "ticket", `${ticket}`);
-      const docSnap = await getDoc(docRef);
-      const data = docSnap.data();
-      setDataTicket(data);
-    }
-    GetEvent();
-  }, []);
-
+  console.log(data);
   if (data !== null) {
     return (
       <section id="tickte">
@@ -52,21 +39,23 @@ export default function TicketPdf({ data }: EventsProps) {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths: [{ params: { ticket: "UuFKnMBdN84meKjwK6Er" } }],
+    paths: [{ params: { ticket: "IABktSBvoW4X1XY2QZDg" } }],
     fallback: true,
   };
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const { params } = context;
-
+  console.log(params);
   const docRef = doc(database, "ticket", `${params?.ticket}`);
   const docSnap = await getDoc(docRef);
   const data = docSnap.data();
 
+  const serializedData = data === undefined ? null : data;
+  console.log("aqui", serializedData);
   return {
     props: {
-      data,
+      data: serializedData,
     },
   };
 };
