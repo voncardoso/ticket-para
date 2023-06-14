@@ -27,7 +27,6 @@ export default function TicketPdf({ data }: EventsProps) {
     GetEvent();
   }, []);
 
-  console.log("props", data);
   if (data !== undefined) {
     return (
       <section id="tickte">
@@ -65,8 +64,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const docSnap = await getDoc(docRef);
   const data = docSnap.data();
 
-  console.log("contesto", context);
-  console.log("teste", data);
   return {
     props: {
       data,
