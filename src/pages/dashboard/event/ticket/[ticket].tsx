@@ -27,7 +27,7 @@ export default function TicketPdf({ data }: EventsProps) {
     GetEvent();
   }, []);
 
-  if (data !== undefined) {
+  if (data !== null) {
     return (
       <section id="tickte">
         <div
