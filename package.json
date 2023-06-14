@@ -24,6 +24,7 @@
     "framer-motion": "^10.12.11",
     "next": "13.3.1",
     "next-firebase-auth": "^1.0.0-canary.19",
+    "pdf-creator-node": "^2.3.5",
     "postcss": "8.4.23",
     "puppeteer": "^20.6.0",
     "qrcode": "^1.5.1",

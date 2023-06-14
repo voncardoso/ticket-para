@@ -5,6 +5,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const { id } = req.query;
+  console.log("aqui", id);
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--disable-dev-shm-usage"],
@@ -27,9 +29,11 @@ export default async function handler(
   await page.waitForNavigation();
 
   // Gere o PDF
-  await page.goto("http://localhost:3000/dashboard/event/ticket/1");
-  await page.waitForNavigation();
-  const pdf = await page.pdf({ format: "A4", preferCSSPageSize: true });
+  await page.goto(`http://localhost:3000/dashboard/event/ticket/${id}`);
+
+  await page.waitForSelector("#tickte", { timeout: 60000 });
+
+  const pdf = await page.pdf({ format: "A4", printBackground: true });
 
   // Encerre o navegador
   await browser.close();

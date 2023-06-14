@@ -20,7 +20,6 @@ export default async function handler(
   try {
     const db = getDatabase(app);
     const refTabela = push(ref(db, "eventos"), data);
-    console.log(refTabela);
     return res.status(200).send("Usuário cadastrado com sucesso");
   } catch (error) {
     return res.status(400).json({ message: "Invalid credentials" });
