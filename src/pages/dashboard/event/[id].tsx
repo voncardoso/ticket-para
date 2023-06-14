@@ -17,6 +17,7 @@ import { addDoc, collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { database } from "@/services/firebase";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 
 interface ticketProps {
   amount: string;
@@ -57,8 +58,6 @@ export default function Event({ data }: EventsProps) {
     GetEvent();
   }, [id]);
 
-  console.log("ticket", tickets);
-  console.log("evento", dataEvent);
   // function para gerar hash
   function createSHA256Hash() {
     const randomBytesLength = 16; // Comprimento em bytes do hash desejado
@@ -107,6 +106,27 @@ export default function Event({ data }: EventsProps) {
     );
 
     setImageQrCode(imgQrCode);
+  }
+
+  async function teste(id: string) {
+    console.log(id);
+    const response = await api.get(`https://ticket-para.vercel.app/api/${id}`, {
+      responseType: "blob", // Configura o tipo de resposta para blob
+    });
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    const urlTeste = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = urlTeste;
+    link.setAttribute("download", `test.pdf`);
+
+    // Append to html link element page
+    document.body.appendChild(link);
+
+    // Start download
+    link.click();
+
+    // Clean up and remove the link
+    // link.parentNode.removeChild(link);
   }
 
   return (
@@ -225,6 +245,7 @@ export default function Event({ data }: EventsProps) {
             </thead>
             <tbody>
               {tickets?.map((ticket: ticketProps, index) => {
+                console.log(ticket.id);
                 // format date
                 let dataString = ticket.date;
                 const data = new Date(dataString);
@@ -270,8 +291,9 @@ export default function Event({ data }: EventsProps) {
                             <div className="w-full flex justify-center">
                               <a
                                 className="p-2"
-                                href={ImageQrCode}
-                                download={`qrcode_N=.png`}
+                                onClick={() => {
+                                  teste(ticket.id);
+                                }}
                               >
                                 Baixar ingresso
                               </a>
