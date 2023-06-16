@@ -1,36 +1,76 @@
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { doc, getDoc} from "firebase/firestore";
 import { database } from "@/services/firebase";
-import { useRouter } from "next/router";
 import { GetStaticPaths, GetStaticProps } from "next";
-
+import { useEffect, useState } from "react";
+import QRCodeLink from "qrcode";
 interface EventsProps {
   data: {
     date: string;
     amount: string;
     type: string;
+    event: string;
+    hash_id: string;
   };
 }
 
 export default function TicketPdf({ data }: EventsProps) {
-  console.log(data);
+  const [ImageQrCode, setImageQrCode] = useState("");
+  const dateEvent = new Date(data?.date);
+  
+
+  
+  function geradorQRCODE(tikect: string) {
+    let imgQrCode = "";
+    let countString = JSON.stringify(tikect);
+
+    QRCodeLink.toDataURL(
+      countString,
+      {
+        width: 400,
+        margin: 3,
+      },
+      function (err, url) {
+        imgQrCode = url;
+      }
+    );
+
+    console.log(imgQrCode)
+    setImageQrCode(imgQrCode);
+  }
+  useEffect(() =>{
+  function getQrCode(){
+    if(data?.hash_id){
+      geradorQRCODE(data?.hash_id)
+    }
+  }
+  getQrCode()
+  }, [data])
+
+  
   if (data?.amount) {
     return (
-      <section id="tickte">
+      <section id="tickte" className="flex">
         <div
-          className="bg-gradient-to-b from-blue-500 to-purple-500"
+          className="bg-gradient-to-b from-blue-500 to-purple-500 flex gap-2 justify-center justify-between items-center"
           style={{
             width: "700px",
             height: "200px",
             margin: "20px auto 20px auto",
-            padding: "50px",
+            padding: "20px 40px",
             borderRadius: "10px",
           }}
         >
-          <h1>Evento 30</h1>
-          <strong>Data: {data?.date}</strong>
-          <strong>Valor: {data?.amount}</strong>
-          <strong>Tipo: {data?.type}</strong>
+          <div className="flex flex-col gap-2">
+            <h1 className="font-bold text-xl">{data?.event}</h1>
+            <span><strong>Data:</strong> {dateEvent.toLocaleDateString("pt-BR", {
+              timeZone: "UTC",
+            })}</span>
+            <span><strong>Valor:</strong> {data?.amount}</span>
+            <span><strong>Tipo:</strong> {data?.type}</span>
+          </div>
+          <div>
+            <img className="w-36" src={ImageQrCode} alt="" />
+          </div>
         </div>
       </section>
     );

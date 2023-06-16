@@ -30,7 +30,7 @@ export default async function handler(
 
   // Gere o PDF
   await page.goto(
-    `http://localhost:3000/dashboard/event/ticket/${id}`
+    `http://localhost:3000/dashboard/event/ticketes/${id}`
   );
 
   await page.waitForSelector("#tickte", { timeout: 60000 });

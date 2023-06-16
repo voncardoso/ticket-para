@@ -19,6 +19,7 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 
+
 interface ticketProps {
   amount: string;
   date: string;
@@ -68,6 +69,7 @@ export default function Event({ data }: EventsProps) {
 
   async function handleCreateTicket(data: any) {
     const tickt = {
+      event: dataEvent?.name,
       amount: data.amount,
       type: data.type,
       date: new Date().toISOString(),
@@ -109,8 +111,27 @@ export default function Event({ data }: EventsProps) {
   }
 
   async function teste(id: string) {
-    console.log(id);
-    const response = await api.get(`https://ticket-para.vercel.app/api/${id}`, {
+    const response = await api.get(`http://localhost:3000/api/${id}`, {
+      responseType: "blob", // Configura o tipo de resposta para blob
+    });
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    const urlTeste = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = urlTeste;
+    link.setAttribute("download", `test.pdf`);
+
+    // Append to html link element page
+    document.body.appendChild(link);
+
+    // Start download
+    link.click();
+
+    // Clean up and remove the link
+    // link.parentNode.removeChild(link);
+  }
+
+  async function pdfTicketLote() {
+    const response = await api.get(`http://localhost:3000/api/tikects/${id}`, {
       responseType: "blob", // Configura o tipo de resposta para blob
     });
     const blob = new Blob([response.data], { type: "application/pdf" });
@@ -142,7 +163,18 @@ export default function Event({ data }: EventsProps) {
           </h1>
         </header>
         <div className="p-4 text-center text-white">Grafico de ingressos</div>
-        <header className="p-4 flex justify-end">
+        <header className="p-4 flex justify-between">
+        <button 
+        className="
+          bg-green-400 opacity-75 py-1 px-4 
+          rounded font-font-medium 
+          rounded-sm text-white hover:opacity-95"
+          onClick={() =>{
+            pdfTicketLote()
+          }}
+        >
+          Baixar lote de ingressos
+        </button>
           <Dialog>
             <DialogTrigger className="bg-green-400 opacity-75 py-1 px-4 rounded font-font-medium rounded-sm text-white hover:opacity-95">
               Cadastrar Ingresso
