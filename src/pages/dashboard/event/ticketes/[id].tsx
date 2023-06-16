@@ -35,41 +35,70 @@ export default function TicketsPdf({ data }: EventsProps){
         return imgQrCode;
       }
 
-      if(data?.length !== 0){
-        return(
-            <section  className="">
-                {data?.map((item: any) =>{
-                    let dateEvent = new Date(item?.date);
-                    return(
-                        <div
-                            key={item.hash_id}
-                            id="tickte"
-                          className="bg-gradient-to-b from-blue-500 to-purple-500 flex gap-2 justify-center justify-between items-center"
-                          style={{
-                            width: "700px",
-                            height: "200px",
-                            margin: "20px auto 20px auto",
-                            padding: "20px 40px",
-                            borderRadius: "10px",
-                          }}
-                        >
-                          <div className="flex flex-col gap-2">
-                            <h1 className="font-bold text-xl">{item?.event}</h1>
-                            <span><strong>Data:</strong> {dateEvent.toLocaleDateString("pt-BR", {
-                                                            timeZone: "UTC",
-                                                            })}</span>
-                            <span><strong>Valor:</strong> {item.amount}</span>
-                            <span><strong>Tipo:</strong> {item.type}</span>
-                          </div>
-                          <div>
-                           <img className="w-36" src={geradorQRCODE(item?.hash_id)} alt="" />
-                          </div>
-                        </div>
-                    )
-                })}
-            </section>
-        )
+    // função para mostrar o array em lista de 4 items
+  function splitForArrayForFour(){
+    var resultado = [];
+    var grupo = 0;
+
+    if (data) {
+      for (var i = 0; i < data.length; i++) {
+        if (resultado[grupo] === undefined) {
+          resultado[grupo] = [];
+        }
+
+        resultado[grupo].push(data[i]);
+
+        if ((i + 1) % 5 === 0) {
+          grupo = grupo + 1;
+        }
       }
+    }
+
+    return resultado
+  }
+
+  if(data?.length !== 0){
+    return(
+      <>
+        {splitForArrayForFour()?.map((item) =>{
+      console.log("item",item)
+      return(
+        <section style={{height: "1105px"}} key={1}  className="">
+            {item?.map((ticket: any) =>{
+                let dateEvent = new Date(ticket?.date);
+                return(
+                    <div
+                        key={ticket.hash_id}
+                        id="tickte"
+                      className="bg-gradient-to-b from-blue-500 to-purple-500 flex gap-2 justify-center justify-between items-center"
+                      style={{
+                        width: "700px",
+                        height: "200px",
+                        margin: "20px auto 20px auto",
+                        padding: "20px 40px",
+                        borderRadius: "10px",
+                      }}
+                    >
+                      <div className="flex flex-col gap-2">
+                        <h1 className="font-bold text-xl">{ticket?.event}</h1>
+                        <span><strong>Data:</strong> {dateEvent.toLocaleDateString("pt-BR", {
+                                                        timeZone: "UTC",
+                                                        })}</span>
+                        <span><strong>Valor:</strong> {ticket.amount}</span>
+                        <span><strong>Tipo:</strong> {ticket.type}</span>
+                      </div>
+                      <div>
+                       <img className="w-36" src={geradorQRCODE(ticket?.hash_id)} alt="" />
+                      </div>
+                    </div>
+                )
+            })}
+        </section>
+      )
+    })}
+      </>
+    )
+  }
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
