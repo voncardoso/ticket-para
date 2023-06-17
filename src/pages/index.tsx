@@ -42,6 +42,7 @@ export default function Home() {
       setError(true);
     }
   };
+
   return (
     <section className="max-md:grid-cols-1 bg-background h-full grid lg:grid-cols-2 justify-between items-center">
       <div className=" w-full max-w-lg mx-auto h-screen flex flex-col justify-between p-94">

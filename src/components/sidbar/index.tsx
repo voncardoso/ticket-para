@@ -1,4 +1,4 @@
-import { CalendarBlank, SignOut } from "@phosphor-icons/react";
+import { CalendarBlank, Gear, SignOut } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -7,6 +7,7 @@ import Image from "next/image";
 
 export default function Sidbar() {
   const router = useRouter();
+  const { id } = router.query;
   const [colorEvent, setColorEvent] = useState("text-white");
   useEffect(() => {
     if (router.pathname === "/dashboard") {
@@ -16,7 +17,7 @@ export default function Sidbar() {
     }
   }, [router.pathname]);
   return (
-    <aside className="w-44 h-screen max-md:w-16 bg-gray-400 flex flex-col justify-between">
+    <aside className="w-48 h-screen max-md:w-16 bg-gray-400 flex flex-col justify-between">
       <div className="p-4 text-white">
         <Link href="" className="">
           {" "}
@@ -33,10 +34,17 @@ export default function Sidbar() {
         </Link>
         <Link
           href="/dashboard"
-          className={`max-md:hidden ${colorEvent} text-lg mt-10 flex items-center gap-2 cursor-pointer hover:text-green-300`}
+          className={`max-md:hidden ${colorEvent} text mt-10 flex items-center gap-2 cursor-pointer hover:text-green-300`}
         >
-          <CalendarBlank size={24} />
+          <CalendarBlank size={22} />
           Eventos
+        </Link>
+        <Link
+          href={`/dashboard/event/config/${id}`}
+          className={`max-md:hidden ${colorEvent} text mt-5 flex items-center gap-2 cursor-pointer hover:text-green-300`}
+        >
+          <Gear size={22} />
+          Configuração
         </Link>
         <Link
           href="/dashboard"
