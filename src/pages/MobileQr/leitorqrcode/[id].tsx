@@ -2,7 +2,7 @@ import { database } from "@/services/firebase";
 import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { QrReader } from "react-qr-reader";
+import { QrReader, QrReaderProps } from "react-qr-reader";
 
 export default function LeitorQrCode() {
   const router = useRouter();
@@ -52,11 +52,16 @@ export default function LeitorQrCode() {
       window.alert("Ingresso Verificado com sucesso");
     } catch (error) {}
   }
+  const handleScan = (result: any, error: Error | null | undefined) => {
+    // Lógica para manipular o resultado da leitura do QR code
+  };
 
+  const qrReaderProps: any = {
+    onResult: handleScan,
+  };
   return (
     <div className="h-screen">
       <QrReader
-        style={{ width: "500px" }}
         onResult={(result: any, error) => {
           if (!!result) {
             setDataWrithQr(result?.text);
@@ -67,6 +72,7 @@ export default function LeitorQrCode() {
             //console.info(error);
           }
         }}
+        {...qrReaderProps}
       />
       <div>teste {dataWrithQr}</div>
     </div>
