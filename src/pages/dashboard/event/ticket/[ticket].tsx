@@ -1,10 +1,12 @@
-import { doc, getDoc} from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { database } from "@/services/firebase";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useEffect, useState } from "react";
 import QRCodeLink from "qrcode";
+import { useRouter } from "next/router";
 interface EventsProps {
   data: {
+    id: string;
     date: string;
     amount: string;
     type: string;
@@ -14,11 +16,11 @@ interface EventsProps {
 }
 
 export default function TicketPdf({ data }: EventsProps) {
+  const router = useRouter();
+  const { ticket } = router.query as any;
   const [ImageQrCode, setImageQrCode] = useState("");
   const dateEvent = new Date(data?.date);
-  
 
-  
   function geradorQRCODE(tikect: string) {
     let imgQrCode = "";
     let countString = JSON.stringify(tikect);
@@ -34,19 +36,20 @@ export default function TicketPdf({ data }: EventsProps) {
       }
     );
 
-    console.log(imgQrCode)
+    console.log(imgQrCode);
     setImageQrCode(imgQrCode);
   }
-  useEffect(() =>{
-  function getQrCode(){
-    if(data?.hash_id){
-      geradorQRCODE(data?.hash_id)
+  useEffect(() => {
+    function getQrCode() {
+      if (data?.hash_id) {
+        geradorQRCODE(ticket);
+      }
     }
-  }
-  getQrCode()
-  }, [data])
+    getQrCode();
+  }, [data]);
 
-  
+  console.log(data);
+
   if (data?.amount) {
     return (
       <section id="tickte" className="flex">
@@ -62,11 +65,18 @@ export default function TicketPdf({ data }: EventsProps) {
         >
           <div className="flex flex-col gap-2">
             <h1 className="font-bold text-xl">{data?.event}</h1>
-            <span><strong>Data:</strong> {dateEvent.toLocaleDateString("pt-BR", {
-              timeZone: "UTC",
-            })}</span>
-            <span><strong>Valor:</strong> {data?.amount}</span>
-            <span><strong>Tipo:</strong> {data?.type}</span>
+            <span>
+              <strong>Data:</strong>{" "}
+              {dateEvent.toLocaleDateString("pt-BR", {
+                timeZone: "UTC",
+              })}
+            </span>
+            <span>
+              <strong>Valor:</strong> {data?.amount}
+            </span>
+            <span>
+              <strong>Tipo:</strong> {data?.type}
+            </span>
           </div>
           <div>
             <img className="w-36" src={ImageQrCode} alt="" />

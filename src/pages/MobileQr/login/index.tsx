@@ -3,6 +3,8 @@ import logo from "../../../assets/logo.png";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { collection, doc, getDocs } from "firebase/firestore";
+import { database } from "@/services/firebase";
 
 export default function LoginMobile() {
   const router = useRouter();
@@ -13,9 +15,34 @@ export default function LoginMobile() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  async function handleLoginUser(user: any) {
+    const collectionRef = collection(database, "UserEvent");
+    const querySnapshot = await getDocs(collectionRef);
+    const data = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const userTrue = data.filter(
+      (item: any) =>
+        item.nameuser === user.nameuser && item.password === user.password
+    ) as any;
+    console.log(userTrue.id);
+    if (userTrue.length === 1) {
+      router.push(`/MobileQr/leitorqrcode/${userTrue[0].id}`);
+    } else {
+      console.log("usuario usuario inexistente", userTrue);
+    }
+  }
+
   return (
     <section className="bg-background h-screen flex items-center">
-      <form action="" className=" w-80  max-w-full  mx-auto grid grid-cols p-4">
+      <form
+        action=""
+        className=" w-80  max-w-full  mx-auto grid grid-cols p-4"
+        onSubmit={handleSubmit(handleLoginUser)}
+      >
         <Image
           className="mx-auto w-32 relative bottom-14"
           src={logo}
@@ -30,14 +57,14 @@ export default function LoginMobile() {
           ""
         )}
         <label className="text-white text-lg" htmlFor="">
-          E-mail
+          Usuario
         </label>
         <input
           className="w-full max-w-full w-full p-3 rounded-md mt-1"
-          type="email"
+          type="text"
           id="email"
           required
-          {...register("email")}
+          {...register("nameuser")}
         />
         <label className="text-white mt-4 text-lg" htmlFor="">
           Senha
