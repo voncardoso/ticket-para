@@ -14,10 +14,10 @@ export default function LoginMobile() {
     formState: { errors },
   } = useForm();
   return (
-    <section className="bg-background h-screen flex justify-between items-center">
+    <section className="bg-background h-screen flex items-center">
       <form action="" className=" w-80  max-w-full  mx-auto grid grid-cols p-4">
         <Image
-          className="mx-auto w-32 relative bottom-15"
+          className="mx-auto w-32 relative bottom-14"
           src={logo}
           alt="logo do site"
         />
