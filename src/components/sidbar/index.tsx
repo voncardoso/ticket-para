@@ -59,7 +59,7 @@ export default function Sidbar() {
           className="max-md:hidden text-lg flex items-center gap-2 cursor-pointer hover:text-green-300"
         >
           <SignOut size={24} />
-          Sair
+          Sair Já!!!!
         </Link>
         <Link
           href=""
