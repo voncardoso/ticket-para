@@ -4,6 +4,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import logomarca from "../../assets/logomarca.png";
 import Image from "next/image";
+import { getAuth, createUserWithEmailAndPassword,signOut } from "firebase/auth";
+import { auth } from "firebase-admin";
+import { isToken } from "typescript";
+//import { signOut } from "firebase/auth";
+//import { getAuth } from "firebase/auth";
 
 export default function Sidbar() {
   const router = useRouter();
@@ -15,7 +20,14 @@ export default function Sidbar() {
     } else {
       setColorEvent("text-white");
     }
-  }, [router.pathname]);
+    
+  },[router.pathname]);
+  function logOut(auth : any){
+    getAuth().signOut().then(() =>{
+      localStorage.removeItem("tokenIngressoPara-v1");
+      router.push("/ ");
+    })
+  }
   return (
     <aside className="w-48 h-screen max-md:w-16 bg-gray-400 flex flex-col justify-between">
       <div className="p-4 text-white">
@@ -57,12 +69,15 @@ export default function Sidbar() {
         <Link
           href=""
           className="max-md:hidden text-lg flex items-center gap-2 cursor-pointer hover:text-green-300"
+          onClick={logOut}
         >
           <SignOut size={24} />
-          Sair Já!!!!
+          Sair
         </Link>
         <Link
+          //type ="submit"
           href=""
+          //onSubmit={logout}
           className="md:hidden text-lg flex items-center gap-2 cursor-pointer hover:text-green-300"
         >
           <SignOut size={26} />
