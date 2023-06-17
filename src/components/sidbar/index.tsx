@@ -16,7 +16,7 @@ export default function Sidbar() {
     }
   }, [router.pathname]);
   return (
-    <aside className="w-60 h-screen max-md:w-16 bg-gray-400 flex flex-col justify-between">
+    <aside className="w-44 h-screen max-md:w-16 bg-gray-400 flex flex-col justify-between">
       <div className="p-4 text-white">
         <Link href="" className="">
           {" "}

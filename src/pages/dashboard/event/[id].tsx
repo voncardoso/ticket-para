@@ -11,14 +11,21 @@ import QRCodeLink from "qrcode";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
-import { Checks, DownloadSimple, QrCode, Ticket, X, XCircle } from "@phosphor-icons/react";
+import {
+  Checks,
+  CurrencyDollar,
+  DownloadSimple,
+  QrCode,
+  Ticket,
+  X,
+  XCircle,
+} from "@phosphor-icons/react";
 import { randomBytes } from "crypto";
 import { addDoc, collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { database } from "@/services/firebase";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-
 
 interface ticketProps {
   amount: string;
@@ -49,24 +56,31 @@ export default function Event({ data }: EventsProps) {
   const [dataEvent, setDataEvent] = useState<any>([]);
   const tickets = data?.filter((item: any) => item.event_id === id);
   const [ImageQrCode, setImageQrCode] = useState("");
-  const incomeBalance = tickets?.reduce((acc: any, ticket: any, index) => {
-  
-    acc.total += 1;
 
-    if(ticket.checked  == true){
-      acc.verifiedTickets += 1;
-    }
-    if(ticket.checked  == false){
-      acc.noTicketsChecked += 1;
-    }
-    return acc
-  }, 
-  {
-    total: 0,
-    verifiedTickets: 0,
-    noTicketsChecked: 0,
-  }); 
+  // função para fazer calculo dos ingressos
+  const incomeBalance = tickets?.reduce(
+    (acc: any, ticket: any, index) => {
+      let amount = ticket.amount.replace(/,/g, ".");
+      console.log(Number(ticket.amount));
+      acc.total += 1;
+      acc.valorTotal += Number(amount);
 
+      if (ticket.checked == true) {
+        acc.verifiedTickets += 1;
+      }
+      if (ticket.checked == false) {
+        acc.noTicketsChecked += 1;
+      }
+      return acc;
+    },
+    {
+      total: 0,
+      valorTotal: 0,
+      verifiedTickets: 0,
+      noTicketsChecked: 0,
+    }
+  );
+  console.log(tickets);
   useEffect(() => {
     async function GetEvent() {
       const docRef = doc(database, "event", `${id}`);
@@ -109,6 +123,7 @@ export default function Event({ data }: EventsProps) {
 
   const dateEvent = new Date(dataEvent?.date);
 
+  // funçao para gerar o qrcode
   function geradorQRCODE(tikect: any) {
     console.log("qr", tikect);
     let imgQrCode = "";
@@ -128,7 +143,7 @@ export default function Event({ data }: EventsProps) {
     setImageQrCode(imgQrCode);
   }
 
-  async function teste(id: string) {
+  async function pdfTicketItem(id: string) {
     const response = await api.get(`http://localhost:3000/api/${id}`, {
       responseType: "blob", // Configura o tipo de resposta para blob
     });
@@ -143,7 +158,6 @@ export default function Event({ data }: EventsProps) {
 
     // Start download
     link.click();
-
   }
 
   async function pdfTicketLote() {
@@ -161,17 +175,9 @@ export default function Event({ data }: EventsProps) {
 
     // Start download
     link.click();
-
-    // Clean up and remove the link
-    // link.parentNode.removeChild(link);
   }
 
-
-
-  console.log(incomeBalance)
-  
-
-  if(data){
+  if (data) {
     return (
       <section className="flex bg-background h-screen gap-5">
         <Sidbar />
@@ -184,24 +190,62 @@ export default function Event({ data }: EventsProps) {
               })}
             </h1>
           </header>
-          <div className="p-4 text-center text-white">Grafico de ingressos</div>
-          <header className="p-4 flex justify-between">
-          <button 
-          className="
+          <ul className="p-4 pl-0 text-center text-white flex justify-between gap-5">
+            <li className="p-4 pt-2   bg-gray-300 w-full rounded">
+              <header className="text-left flex justify-between items-center text-green-300 mb-2">
+                <span className="text-sm font-semibold ">Valor arrecadado</span>
+                <CurrencyDollar weight="bold" size={20} />
+              </header>
+              <strong className="text-4xl">
+                {Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(incomeBalance.valorTotal)}
+              </strong>
+            </li>
+            <li className="p-4 pt-2   bg-gray-300 w-full rounded">
+              <header className="text-left flex justify-between items-center text-amber-600 mb-2">
+                <span className="text-sm font-semibold">Total</span>
+                <Ticket weight="bold" size={20} />
+              </header>
+              <strong className="text-4xl ">{incomeBalance.total}</strong>
+            </li>
+            <li className="p-4 pt-2   bg-gray-300 w-full rounded">
+              <header className="text-left flex justify-between items-center text-blue-500 mb-2 ">
+                <span className="text-sm font-semibold">Verificados</span>
+                <Checks weight="bold" size={22} />
+              </header>
+              <strong className="text-4xl">
+                {incomeBalance.verifiedTickets}
+              </strong>
+            </li>
+            <li className="p-4 pt-2   bg-gray-300 w-full rounded">
+              <header className="text-left flex justify-between items-center text-red-500 mb-2">
+                <span className="text-sm font-semibold">Não verificados</span>
+                <XCircle weight="bold" size={20} />
+              </header>
+              <strong className="text-4xl">
+                {incomeBalance.noTicketsChecked}
+              </strong>
+            </li>
+          </ul>
+          <header className="p-4 pl-0 flex justify-between">
+            <button
+              className="
             flex
             gap-2
             items-center
-            bg-blue-700 opacity-75 py-1 px-4 
-            rounded font-font-medium 
+            text-fuchsia-500 opacity-75 py-1 px-4 
+            font-semibold
             rounded text-white hover:opacity-95"
-            onClick={() =>{
-              pdfTicketLote()
-            }}
-          >
-            <DownloadSimple size={22}/>  Baixar ingressos
-          </button>
+              onClick={() => {
+                pdfTicketLote();
+              }}
+            >
+              <DownloadSimple size={20} /> Baixar ingressos
+            </button>
             <Dialog>
-              <DialogTrigger className="bg-green-400 opacity-75 py-1 px-4 rounded font-font-medium rounded-sm text-white hover:opacity-95">
+              <DialogTrigger className="bg-green-400 opacity-75 py-1 px-4 rounded font-font-medium  text-white hover:opacity-95">
                 Cadastrar Ingresso
               </DialogTrigger>
               <DialogPortal>
@@ -250,7 +294,7 @@ export default function Event({ data }: EventsProps) {
                           })}
                         </select>
                       </label>
-  
+
                       <label className="flex flex-col w-full" htmlFor="">
                         {dataEvent?.typeTicket?.map((item: any) => {
                           if (watch("type") === item.type) {
@@ -268,7 +312,7 @@ export default function Event({ data }: EventsProps) {
                           }
                         })}
                       </label>
-  
+
                       {watch("type") && (
                         <label className="flex flex-col w-full  " htmlFor="">
                           Quantidade de Ingresso
@@ -288,7 +332,7 @@ export default function Event({ data }: EventsProps) {
               </DialogPortal>
             </Dialog>
           </header>
-          <div className=" pr-5 mb-5" >
+          <div className=" pr-5 mb-5">
             <table className="table-auto w-full text-center ">
               <thead>
                 <tr className="bg-gray-400 text-white ">
@@ -328,7 +372,7 @@ export default function Event({ data }: EventsProps) {
                           <DialogTrigger className="text-white opacity-75 py-1 px-4 rounded font-font-medium rounded-sm text-white hover:opacity-95">
                             <QrCode weight="duotone" size={22} />
                           </DialogTrigger>
-  
+
                           <DialogPortal>
                             <DialogOverlay className=" fixed inset-0 bg-black bg-opacity-50" />
                             <DialogContent className="p-4 mx-px-4 text-white bg-gray-400 z-20   fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md  shadow-green-50">
@@ -337,22 +381,28 @@ export default function Event({ data }: EventsProps) {
                                   <X />
                                 </button>
                               </DialogClose>
-  
+
                               <div className="p-4 w-8xl roudend rounded-md flex bg-gradient-to-b from-blue-500 to-purple-500 gap-10">
                                 <div className="w-full">
                                   <strong>Nome do evento</strong>
                                   <p>Tipo do ingresso: {ticket.type}</p>
                                 </div>
-                                <img className="w-32" src={ImageQrCode} alt="" />
+                                <img
+                                  className="w-32"
+                                  src={ImageQrCode}
+                                  alt=""
+                                />
                               </div>
                               <div className="w-full flex justify-center cursor-pointer">
                                 <a
-                                  className="p-2"
+                                  className="mt-4 p-2 text-fuchsia-500 opacity-75 py-1 px-4 
+                                  font-semibold
+                                  rounded text-white hover:opacity-95 flex items-center gap-2"
                                   onClick={() => {
-                                    teste(ticket.id);
+                                    pdfTicketItem(ticket.id);
                                   }}
                                 >
-                                  Baixar ingresso
+                                  <DownloadSimple size={20} /> Baixar ingresso
                                 </a>
                               </div>
                             </DialogContent>
@@ -361,15 +411,15 @@ export default function Event({ data }: EventsProps) {
                       </td>
                       <td>
                         {ticket.checked ? (
-                          <Checks className="text-green-300" size={30} />
+                          <Checks className="text-blue-500 " size={24} />
                         ) : (
-                          <XCircle className="text-red-600" size={28} />
+                          <XCircle className="text-red-500" size={24} />
                         )}
                       </td>
                     </tr>
                   );
                 })}
-  
+
                 <tr className=" bg-gray-400  border-b-2 border-gray-400 ">
                   <td
                     colSpan={6}
@@ -399,7 +449,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     ...doc.data(),
     id: doc.id,
   }));
-
 
   return {
     props: {
