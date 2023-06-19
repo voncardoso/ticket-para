@@ -472,7 +472,7 @@ export default function Event({ data }: EventsProps) {
           <div className="w-full flex justify-center">
             <ThemeProvider theme={darkTheme}>
               <Pagination
-                className="mt-2.5 mb-3 text-white"
+                className=" mb-3 text-white"
                 count={totalPages}
                 onChange={goToPage}
                 variant="text"
