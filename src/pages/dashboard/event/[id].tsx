@@ -26,7 +26,9 @@ import { database } from "@/services/firebase";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-
+import Pagination from "@mui/material/Pagination";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { FormEvent } from "react";
 interface ticketProps {
   amount: string;
   date: string;
@@ -52,10 +54,33 @@ export default function Event({ data }: EventsProps) {
     watch,
     setValue,
   } = useForm();
-
+  const darkTheme = createTheme({
+    palette: {
+      mode: "dark",
+    },
+  });
   const [dataEvent, setDataEvent] = useState<any>([]);
-  const tickets = data?.filter((item: any) => item.event_id === id);
+  const tickets = data
+    ?.filter((item: any) => item.event_id === id)
+    .sort((a: any, b: any) => {
+      let dataString = a.date;
+      const data = new Date(dataString);
+      const dataUTC_A = data.toLocaleDateString("pt-BR", {
+        timeZone: "UTC",
+      }) as any;
+
+      let dataString_B = b.date;
+      const data_B = new Date(dataString_B);
+      const dataUTC_B = data_B.toLocaleDateString("pt-BR", {
+        timeZone: "UTC",
+      }) as any;
+
+      console.log(dataUTC_A, dataUTC_B);
+      return dataUTC_A.localeCompare(dataUTC_B);
+    });
   const [ImageQrCode, setImageQrCode] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // função para fazer calculo dos ingressos
   const incomeBalance = tickets?.reduce(
@@ -127,7 +152,7 @@ export default function Event({ data }: EventsProps) {
   function geradorQRCODE(tikect: any) {
     console.log("qr", tikect);
     let imgQrCode = "";
-    let countString = JSON.stringify(tikect.hash_id);
+    let countString = JSON.stringify(tikect);
 
     QRCodeLink.toDataURL(
       countString,
@@ -175,6 +200,22 @@ export default function Event({ data }: EventsProps) {
 
     // Start download
     link.click();
+  }
+
+  // criar paginação
+  function paginate(items: any, currentPage: any, itemsPerPage: any) {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    if (items) {
+      return items.slice(startIndex, endIndex);
+    }
+  }
+
+  const paginatedData = paginate(tickets, currentPage, itemsPerPage);
+  const totalPages = Math.ceil(tickets?.length / itemsPerPage);
+
+  function goToPage(event: any, pageNumber: any) {
+    setCurrentPage(pageNumber);
   }
 
   if (data) {
@@ -336,8 +377,7 @@ export default function Event({ data }: EventsProps) {
             <table className="table-auto w-full text-center ">
               <thead>
                 <tr className="bg-gray-400 text-white ">
-                  <th className="p-2 rounded-ss-md">Nº</th>
-                  <th className="p-2 ">Data</th>
+                  <th className="p-2 rounded-ss-md">Data</th>
                   <th className="p-2 ">Valor</th>
                   <th className="p-2 ">Tipo</th>
                   <th className="p-2 "></th>
@@ -345,7 +385,7 @@ export default function Event({ data }: EventsProps) {
                 </tr>
               </thead>
               <tbody>
-                {tickets?.map((ticket: ticketProps, index) => {
+                {paginatedData?.map((ticket: ticketProps, index: any) => {
                   console.log(ticket.id);
                   // format date
                   let dataString = ticket.date;
@@ -353,19 +393,19 @@ export default function Event({ data }: EventsProps) {
                   const dataUTC = data.toLocaleDateString("pt-BR", {
                     timeZone: "UTC",
                   });
+
                   return (
                     <tr
-                      key={ticket.hash_id}
+                      key={ticket.id}
                       className="bg-gray-300 text-white border-b-2 border-gray-400 cursor-pointer hover:opacity-75"
                     >
-                      <td className="p-2">{index + 1}</td>
                       <td className="p-2">{dataUTC}</td>
                       <td className="p-2">{ticket.amount}</td>
                       <td className="p-2">{ticket.type}</td>
                       <td
                         className="p-2"
                         onClick={() => {
-                          geradorQRCODE(ticket);
+                          geradorQRCODE(ticket.id);
                         }}
                       >
                         <Dialog>
@@ -428,6 +468,18 @@ export default function Event({ data }: EventsProps) {
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div className="w-full flex justify-center">
+            <ThemeProvider theme={darkTheme}>
+              <Pagination
+                className="mt-2.5 mb-3 text-white"
+                count={totalPages}
+                onChange={goToPage}
+                variant="text"
+                shape="rounded"
+                style={{ color: "red" }}
+              />
+            </ThemeProvider>
           </div>
         </div>
       </section>
