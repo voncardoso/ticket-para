@@ -2,10 +2,11 @@ import { database } from "@/services/firebase";
 import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { QrReader, QrReaderProps } from "react-qr-reader";
+import { Html5QrcodeScanner } from "html5-qrcode";
 
 export default function LeitorQrCode() {
   const router = useRouter();
+  const [scanResult, setScanResult] = useState(null);
   const [dataWrithQr, setDataWrithQr] = useState<any>([]);
   const { id } = router.query;
   const [users, setUsers] = useState<any>([]);
@@ -52,29 +53,42 @@ export default function LeitorQrCode() {
       window.alert("Ingresso Verificado com sucesso");
     } catch (error) {}
   }
-  const handleScan = (result: any, error: Error | null | undefined) => {
-    // Lógica para manipular o resultado da leitura do QR code
-  };
 
-  const qrReaderProps: any = {
-    onResult: handleScan,
-  };
+  useEffect(() => {
+    const scanner = new Html5QrcodeScanner(
+      "reader",
+      {
+        qrbox: {
+          width: 400,
+          height: 400,
+        },
+        fps: 5,
+      },
+      true
+    );
+
+    scanner.render(success, error);
+
+    function success(result: any) {
+      scanner.clear();
+      setScanResult(result);
+    }
+
+    function error(err: any) {
+      console.warn(err);
+    }
+  }, []);
+
   return (
-    <div className="h-screen">
-      <QrReader
-        onResult={(result: any, error) => {
-          if (!!result) {
-            setDataWrithQr(result?.text);
-            updateQrCode(result?.text);
-          }
-
-          if (!!error) {
-            //console.info(error);
-          }
-        }}
-        {...qrReaderProps}
-      />
-      <div>teste {dataWrithQr}</div>
+    <div className="Scanner">
+      <h1>Ler QR Code</h1>
+      {scanResult ? (
+        <div>
+          Dados do QR Code: <a href={"http://" + scanResult}>{scanResult}</a>
+        </div>
+      ) : (
+        <div id="reader"></div>
+      )}
     </div>
   );
 }
