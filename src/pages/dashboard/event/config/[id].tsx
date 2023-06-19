@@ -214,6 +214,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const docSnap = await getDoc(docRef);
   const data = docSnap.data();
 
+  const serializedData = data === undefined ? null : data;
+
   const docRefUser = collection(database, "UserEvent");
   const docSnapUser = await getDocs(docRefUser);
   const dataUser = docSnapUser.docs.map((doc) => ({
@@ -221,9 +223,11 @@ export const getStaticProps: GetStaticProps = async (context) => {
     id: doc.id,
   }));
 
+  const serializedDataUser = dataUser === undefined ? null : dataUser;
+
   return {
     props: {
-      data,
+      data: serializedData,
       dataUser,
     },
   };
