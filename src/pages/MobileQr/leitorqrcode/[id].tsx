@@ -6,7 +6,7 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 
 export default function LeitorQrCode() {
   const router = useRouter();
-  const [scanResult, setScanResult] = useState(null);
+  const [scanResult, setScanResult] = useState("");
   const [dataWrithQr, setDataWrithQr] = useState<any>([]);
   const { id } = router.query;
   const [users, setUsers] = useState<any>([]);
@@ -42,7 +42,7 @@ export default function LeitorQrCode() {
     getUser();
   }, [users]);
 
-  async function updateQrCode(idticket: string) {
+  async function updateQrCode(idticket: any) {
     let repleceQr = dataWrithQr;
     console.log("teste", idticket?.replace(/"/g, ""));
     try {
@@ -51,6 +51,7 @@ export default function LeitorQrCode() {
         checked: true,
       });
       window.alert("Ingresso Verificado com sucesso");
+      window.location.reload();
     } catch (error) {}
   }
 
@@ -71,6 +72,7 @@ export default function LeitorQrCode() {
 
     function success(result: any) {
       scanner.clear();
+      updateQrCode(result);
       setScanResult(result);
     }
 
@@ -81,10 +83,9 @@ export default function LeitorQrCode() {
 
   return (
     <div className="Scanner">
-      <h1>Ler QR Code</h1>
       {scanResult ? (
         <div>
-          Dados do QR Code: <a href={"http://" + scanResult}>{scanResult}</a>
+          Dados do QR Code: <span>{scanResult}</span>
         </div>
       ) : (
         <div id="reader"></div>
