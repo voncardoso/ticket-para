@@ -23,7 +23,7 @@ import {
 import { randomBytes } from "crypto";
 import { addDoc, collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { database } from "@/services/firebase";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import Pagination from "@mui/material/Pagination";
@@ -173,7 +173,7 @@ export default function Event({ data }: EventsProps) {
 
   async function pdfTicketItem(id: string) {
     setActiveModal(true);
-    const response = await api.get(`http://localhost:3000/api/${id}`, {
+    const response = await api.get(`https://ticket-para.vercel.app/api/${id}`, {
       responseType: "blob", // Configura o tipo de resposta para blob
     });
 
@@ -195,9 +195,12 @@ export default function Event({ data }: EventsProps) {
 
   async function pdfTicketLote() {
     setActiveModal(true);
-    const response = await api.get(`http://localhost:3000/api/tikects/${id}`, {
-      responseType: "blob", // Configura o tipo de resposta para blob
-    });
+    const response = await api.get(
+      `https://ticket-para.vercel.app/api/tikects/${id}`,
+      {
+        responseType: "blob", // Configura o tipo de resposta para blob
+      }
+    );
 
     if (response) {
       setActiveModal(false);
@@ -543,7 +546,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const collectionRef = collection(database, "ticket");
   const querySnapshot = await getDocs(collectionRef);
   const data = querySnapshot.docs.map((doc) => ({
