@@ -421,17 +421,42 @@ export default function Event({ data }: EventsProps) {
                                   <X />
                                 </button>
                               </DialogClose>
-
-                              <div className="p-4 w-8xl roudend rounded-md flex bg-gradient-to-b from-blue-500 to-purple-500 gap-10">
-                                <div className="w-full">
-                                  <strong>Nome do evento</strong>
-                                  <p>Tipo do ingresso: {ticket.type}</p>
+                              <div
+                                className="bg-gradient-to-b from-blue-500 to-purple-500 flex gap-2 justify-center justify-between items-center"
+                                style={{
+                                  width: "700px",
+                                  height: "200px",
+                                  margin: "20px auto 20px auto",
+                                  padding: "20px 40px",
+                                  borderRadius: "10px",
+                                }}
+                              >
+                                <div className="flex flex-col gap-2">
+                                  <h1 className="font-bold text-xl">
+                                    {dataEvent?.name}
+                                  </h1>
+                                  <span>
+                                    <strong>Data:</strong>{" "}
+                                    {dateEvent.toLocaleDateString("pt-BR", {
+                                      timeZone: "UTC",
+                                    })}
+                                  </span>
+                                  <span>
+                                    <strong>Valor:</strong> {ticket.amount}
+                                  </span>
+                                  <span>
+                                    <strong>Tipo:</strong> {ticket.type}
+                                  </span>
                                 </div>
-                                <img
-                                  className="w-32"
-                                  src={ImageQrCode}
-                                  alt=""
-                                />
+                                <div>
+                                  <div>
+                                    <img
+                                      className="w-32"
+                                      src={ImageQrCode}
+                                      alt=""
+                                    />
+                                  </div>
+                                </div>
                               </div>
                               <div className="w-full flex justify-center cursor-pointer">
                                 <a

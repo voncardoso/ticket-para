@@ -48,7 +48,7 @@ export default function Sidbar() {
         </Link>
         <Link
           href="/dashboard"
-          className={`md:hidden ${colorEvent} text-lg mt-10 flex items-center gap-2 cursor-pointer hover:text-green-300`}
+          className={`md:hidden $text-white text-lg mt-10 flex items-center gap-2 cursor-pointer hover:text-green-300`}
         >
           <CalendarBlank size={26} />
         </Link>

@@ -195,6 +195,44 @@ export default function Config({ data, dataUser }: EventsProps) {
             </tbody>
           </table>
         </div>
+        <div className="text-white">
+          <h1>Estilizar ingresso</h1>
+
+          <form action="">
+            <label htmlFor="">
+              Color 1
+              <input type="color" />
+            </label>
+            <label htmlFor="">
+              Color 2
+              <input type="color" />
+            </label>
+          </form>
+
+          <div
+            className="bg-gradient-to-b from-blue-500 to-purple-500 flex gap-2 justify-center justify-between items-center"
+            style={{
+              width: "700px",
+              height: "200px",
+              margin: "20px auto 20px auto",
+              padding: "20px 40px",
+              borderRadius: "10px",
+            }}
+          >
+            <div className="flex flex-col gap-2">
+              <h1 className="font-bold text-xl">Ingressos Pará</h1>
+              <span>
+                <strong>Data:</strong> 12/12/2023
+              </span>
+              <span>
+                <strong>Valor:</strong> 100,00
+              </span>
+              <span>
+                <strong>Tipo:</strong> Cadeira
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
