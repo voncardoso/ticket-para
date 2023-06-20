@@ -29,6 +29,7 @@ import { api } from "@/lib/api";
 import Pagination from "@mui/material/Pagination";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { FormEvent } from "react";
+import { CircularProgress } from "@mui/material";
 interface ticketProps {
   amount: string;
   date: string;
@@ -46,6 +47,7 @@ interface EventsProps {
 export default function Event({ data }: EventsProps) {
   const router = useRouter();
   const { id } = router.query;
+  const [activeModal, setActiveModal] = useState(false);
   const {
     register,
     handleSubmit,
@@ -151,6 +153,7 @@ export default function Event({ data }: EventsProps) {
   // funçao para gerar o qrcode
   function geradorQRCODE(tikect: any) {
     console.log("qr", tikect);
+
     let imgQrCode = "";
     let countString = JSON.stringify(tikect);
 
@@ -169,9 +172,14 @@ export default function Event({ data }: EventsProps) {
   }
 
   async function pdfTicketItem(id: string) {
+    setActiveModal(true);
     const response = await api.get(`http://localhost:3000/api/${id}`, {
       responseType: "blob", // Configura o tipo de resposta para blob
     });
+
+    if (response) {
+      setActiveModal(false);
+    }
     const blob = new Blob([response.data], { type: "application/pdf" });
     const urlTeste = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -186,9 +194,14 @@ export default function Event({ data }: EventsProps) {
   }
 
   async function pdfTicketLote() {
+    setActiveModal(true);
     const response = await api.get(`http://localhost:3000/api/tikects/${id}`, {
       responseType: "blob", // Configura o tipo de resposta para blob
     });
+
+    if (response) {
+      setActiveModal(false);
+    }
     const blob = new Blob([response.data], { type: "application/pdf" });
     const urlTeste = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -506,6 +519,17 @@ export default function Event({ data }: EventsProps) {
               />
             </ThemeProvider>
           </div>
+
+          {activeModal === true ? (
+            <div className=" position absolut z-40 fixed inset-0 bg-black bg-opacity-50">
+              <div className="flex justify-center flex-col items-center p-20 text-2xl text-white bg-gray-400 z-20   fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-md  shadow-green-50">
+                <CircularProgress size={60} color="success" />
+                <h1 className="mt-5">Gerando Pdf...</h1>
+              </div>
+            </div>
+          ) : (
+            ""
+          )}
         </div>
       </section>
     );

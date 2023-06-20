@@ -19,7 +19,7 @@ import {
   DialogClose,
 } from "@radix-ui/react-dialog";
 import { motion, AnimatePresence } from "framer-motion";
-import { GetStaticProps } from "next";
+import { GetServerSideProps, GetStaticProps } from "next";
 import { database } from "@/services/firebase";
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
 import {
@@ -266,7 +266,7 @@ export default function Dashboard({ data }: EventsProps) {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async () => {
   const collectionRef = collection(database, "event");
   const querySnapshot = await getDocs(collectionRef);
   const data = querySnapshot.docs.map((doc) => ({

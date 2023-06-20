@@ -196,19 +196,7 @@ export default function Config({ data, dataUser }: EventsProps) {
           </table>
         </div>
         <div className="text-white">
-          <h1>Estilizar ingresso</h1>
-
-          <form action="">
-            <label htmlFor="">
-              Color 1
-              <input type="color" />
-            </label>
-            <label htmlFor="">
-              Color 2
-              <input type="color" />
-            </label>
-          </form>
-
+          <h1 className="text-xl texte-center">Configurar Ingressos</h1>
           <div
             className="bg-gradient-to-b from-blue-500 to-purple-500 flex gap-2 justify-center justify-between items-center"
             style={{
