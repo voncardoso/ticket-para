@@ -539,14 +539,14 @@ export default function Event({ data }: EventsProps) {
   }
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: [{ params: { id: "UuFKnMBdN84meKjwK6Er" } }],
-    fallback: true,
-  };
-};
+//export const getStaticPaths: GetStaticPaths = async () => {
+//  return {
+//    paths: [{ params: { id: "UuFKnMBdN84meKjwK6Er" } }],
+//    fallback: true,
+//  };
+//};
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   const collectionRef = collection(database, "ticket");
   const querySnapshot = await getDocs(collectionRef);
   const data = querySnapshot.docs.map((doc) => ({
